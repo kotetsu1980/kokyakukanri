@@ -1,0 +1,718 @@
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>受注管理</title>
+<style>
+:root {
+  --bg: #f5f5f0;
+  --surface: #ffffff;
+  --border: #e0ddd8;
+  --border-strong: #c8c5c0;
+  --text: #1a1a18;
+  --text-sub: #6b6b68;
+  --text-muted: #9b9b98;
+  --accent: #2563eb;
+  --accent-bg: #eff6ff;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, 'Hiragino Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; min-height: 100vh; }
+
+/* ===== SPLASH ===== */
+#splash {
+  position: fixed; inset: 0; background: #fff; z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: opacity 0.6s ease;
+}
+#splash.hide { opacity: 0; pointer-events: none; }
+.splash-en {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 28px; font-weight: 400; letter-spacing: 0.18em;
+  color: #1a1a18; text-transform: uppercase;
+}
+.splash-line {
+  width: 40px; height: 1px; background: #1a1a18;
+  margin: 20px auto;
+}
+.splash-sub {
+  font-size: 11px; letter-spacing: 0.3em; color: #9b9b98; text-transform: uppercase;
+}
+.splash-hint {
+  position: absolute; bottom: 52px;
+  font-size: 11px; letter-spacing: 0.2em; color: #c8c5c0; text-transform: uppercase;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+/* ===== HEADER ===== */
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; position: sticky; top: 0; z-index: 100; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+header h1 { font-size: 18px; font-weight: 600; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.add-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.add-btn svg { width: 15px; height: 15px; }
+.gear-btn { background: none; border: 1px solid var(--border); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-sub); }
+.gear-btn svg { width: 18px; height: 18px; }
+
+/* ===== SUMMARY ===== */
+.summary { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 16px; overflow-x: auto; }
+.summary::-webkit-scrollbar { display: none; }
+.stat { display: flex; flex-direction: column; align-items: center; min-width: 72px; }
+.stat-num { font-size: 18px; font-weight: 600; }
+.stat-label { font-size: 11px; color: var(--text-sub); margin-top: 2px; white-space: nowrap; }
+.stat-divider { width: 1px; background: var(--border); flex-shrink: 0; }
+
+/* ===== TOOLBAR ===== */
+.toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 8px; align-items: center; }
+.search-wrap { flex: 1; position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; }
+.search-input { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 28px 8px 32px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; }
+.search-input:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+.search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: var(--border-strong); border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; color: var(--text-sub); display: none; align-items: center; justify-content: center; }
+.search-clear.visible { display: flex; }
+.sort-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 11px; font-size: 13px; color: var(--text-sub); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.sort-btn svg { width: 14px; height: 14px; transition: transform 0.2s; }
+.sort-btn.asc svg { transform: rotate(180deg); }
+
+/* ===== ACCORDION ===== */
+.month-section { border-bottom: 1px solid var(--border); }
+.month-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 16px; cursor: pointer; background: var(--surface);
+  user-select: none; gap: 8px;
+}
+.month-toggle:active { background: #f9f9f7; }
+.month-left { display: flex; align-items: center; gap: 10px; }
+.month-title { font-size: 15px; font-weight: 600; }
+.month-sub { font-size: 12px; color: var(--text-sub); }
+.month-right { display: flex; align-items: center; gap: 8px; }
+.incomplete-badge {
+  font-size: 11px; font-weight: 500; color: var(--warn);
+  background: var(--warn-bg); border: 1px solid #fde68a;
+  border-radius: 20px; padding: 2px 9px; white-space: nowrap;
+}
+.chevron { width: 18px; height: 18px; color: var(--text-muted); transition: transform 0.25s; flex-shrink: 0; }
+.month-section.open .chevron { transform: rotate(180deg); }
+.month-body { display: none; overflow: hidden; }
+.month-section.open .month-body { display: block; }
+
+/* ===== TABLE ===== */
+.table-wrap { overflow-x: auto; }
+table { width: max-content; min-width: 100%; border-collapse: collapse; background: var(--surface); }
+th, td { border: 1px solid var(--border); padding: 0; }
+th { background: #f9f9f7; font-size: 12px; font-weight: 500; color: var(--text-sub); text-align: center; padding: 7px 10px; white-space: nowrap; }
+td { font-size: 13px; text-align: center; vertical-align: top; }
+td.left { text-align: left; padding: 8px 10px; }
+td.right { text-align: right; padding: 8px 10px; }
+td.center { padding: 8px 10px; vertical-align: middle; }
+tr:hover td { background: #fafaf8; }
+tr.group-start td { border-top: 2px solid #d1d5db; }
+tr.highlight td { background: #fffbeb !important; }
+
+/* Note cell — wraps, auto-expands */
+.note-cell { min-width: 120px; max-width: 200px; white-space: normal; word-break: break-all; padding: 6px 10px; text-align: left; vertical-align: middle; min-height: 44px; line-height: 1.5; font-size: 12px; color: var(--text-sub); }
+
+/* Status toggles */
+.toggle-cell { cursor: pointer; user-select: none; min-width: 40px; vertical-align: middle; }
+.toggle-cell:active { background: var(--accent-bg) !important; }
+.toggle-mark { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border-strong); color: transparent; font-size: 14px; transition: all 0.15s; }
+.toggle-mark.on { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.toggle-mark.check { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+td.actions { padding: 0; vertical-align: middle; }
+.row-action-btn { background: none; border: none; cursor: pointer; padding: 8px 10px; color: var(--text-sub); font-size: 16px; display: block; width: 100%; }
+
+/* ===== EMPTY ===== */
+.empty { text-align: center; padding: 60px 20px; color: var(--text-sub); }
+.empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+
+/* ===== MODAL (shared) ===== */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); border-radius: 20px 20px 0 0; }
+.modal-title { font-size: 17px; font-weight: 600; }
+.close-btn { background: #f0efec; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sub); }
+.modal-body { padding: 16px 20px; }
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 5px; }
+.form-row input, .form-row select { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 15px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; }
+.form-row input:focus, .form-row select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.auto-textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 15px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; min-height: 80px; resize: none; overflow: hidden; line-height: 1.6; }
+.auto-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-footer { padding: 12px 20px 20px; display: flex; gap: 10px; }
+.btn-cancel { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 500; color: var(--text-sub); cursor: pointer; }
+.btn-save { flex: 2; background: var(--accent); border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 600; color: #fff; cursor: pointer; }
+.btn-delete { flex: 1; background: #fee2e2; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 500; color: #dc2626; cursor: pointer; }
+
+/* ===== SETTINGS MODAL ===== */
+.settings-list { padding: 8px 0; }
+.settings-item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border); }
+.settings-item:last-child { border-bottom: none; }
+.settings-item:active { background: var(--bg); }
+.settings-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.settings-icon svg { width: 20px; height: 20px; }
+.settings-icon.blue { background: #eff6ff; color: #2563eb; }
+.settings-icon.green { background: #f0fdf4; color: #16a34a; }
+.settings-icon.red { background: #fee2e2; color: #dc2626; }
+.settings-text { flex: 1; }
+.settings-text strong { display: block; font-size: 15px; font-weight: 500; }
+.settings-text span { font-size: 12px; color: var(--text-sub); }
+.settings-arrow { color: var(--text-muted); }
+.settings-arrow svg { width: 16px; height: 16px; }
+
+mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; }
+.amount { font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" onclick="hideSplash()">
+  <div class="splash-en">Customer<br style="display:none"> Management</div>
+  <div class="splash-line"></div>
+  <div class="splash-sub">受注管理</div>
+  <div class="splash-hint">tap to enter</div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+<header>
+  <div class="header-inner">
+    <h1>受注管理</h1>
+    <div class="header-actions">
+      <button class="add-btn" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        新規登録
+      </button>
+      <button class="gear-btn" onclick="openSettings()" aria-label="設定">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="summaryBar" class="summary"></div>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="searchInput" type="search" placeholder="購入者・品名・日付・金額・備考" oninput="onSearch(this.value)">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+  <button class="sort-btn" id="sortBtn" onclick="toggleSort()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+    <span id="sortLabel">新しい順</span>
+  </button>
+</div>
+
+<div id="mainContent"></div>
+<div id="emptyState" class="empty" style="display:none">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+  <p id="emptyMsg">受注データがありません</p>
+  <p style="font-size:13px;margin-top:6px" id="emptySubMsg">「新規登録」から追加してください</p>
+</div>
+
+</div><!-- /app -->
+
+<!-- 受注入力モーダル -->
+<div class="overlay" id="overlay" onclick="onOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">新規登録</span>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>日付</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-row-2">
+        <div class="form-row" style="margin:0"><label>購入者</label><input type="text" id="f-buyer" placeholder="山田"></div>
+        <div class="form-row" style="margin:0"><label>回数 (任意)</label><input type="number" id="f-count" placeholder="" min="1"></div>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>品名</label>
+        <input type="text" id="f-item" placeholder="アクセサリー">
+      </div>
+      <div class="form-row-2">
+        <div class="form-row" style="margin:0"><label>単価 (円)</label><input type="number" id="f-price" placeholder="5000" min="0"></div>
+        <div class="form-row" style="margin:0"><label>数量</label><input type="number" id="f-qty" placeholder="1" min="1" value="1"></div>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>備考 (任意)</label>
+        <textarea class="auto-textarea" id="f-note" placeholder="予約、100個/1ロットなど" oninput="autoResize(this)"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" id="modalFooter">
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveOrder()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 設定モーダル -->
+<div class="overlay" id="settingsOverlay" onclick="onSettingsOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">設定</span>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-list">
+      <div class="settings-item" onclick="exportCSV()">
+        <div class="settings-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div class="settings-text"><strong>CSVで出力</strong><span>全データをCSVファイルとしてダウンロード</span></div>
+        <div class="settings-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+      </div>
+      <div class="settings-item" onclick="backupData()">
+        <div class="settings-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="20 7 20 3 4 3 4 7"/><path d="M9 11H4v10h16V11h-5"/><polyline points="9 11 12 8 15 11"/><line x1="12" y1="8" x2="12" y2="19"/></svg>
+        </div>
+        <div class="settings-text"><strong>バックアップ</strong><span>データをJSONファイルとして保存</span></div>
+        <div class="settings-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+      </div>
+      <div class="settings-item" onclick="restoreData()">
+        <div class="settings-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4 17 4 21 20 21 20 17"/><path d="M15 13H20V3H4v10h5"/><polyline points="15 13 12 16 9 13"/><line x1="12" y1="16" x2="12" y2="5"/></svg>
+        </div>
+        <div class="settings-text"><strong>バックアップから復元</strong><span>JSONファイルからデータを読み込む</span></div>
+        <div class="settings-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+      </div>
+      <div class="settings-item" onclick="deleteAllData()">
+        <div class="settings-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </div>
+        <div class="settings-text"><strong>データを削除</strong><span>全受注データを消去します</span></div>
+        <div class="settings-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="onRestoreFile(event)">
+
+<script>
+const STORAGE_KEY = 'order_manager_v1';
+let orders = [];
+let editId = null;
+let sortAsc = false;
+let searchQuery = '';
+// track open months: key = month string, value = bool
+let openMonths = {};
+
+/* ===== SPLASH ===== */
+function hideSplash() {
+  const s = document.getElementById('splash');
+  s.classList.add('hide');
+  document.getElementById('app').style.display = 'block';
+  setTimeout(() => s.style.display = 'none', 650);
+}
+
+/* ===== STORAGE ===== */
+function load() {
+  try { orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { orders = []; }
+}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function fmt(n) { return Number(n).toLocaleString('ja-JP'); }
+function fmtDate(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  return `${parseInt(m)}/${parseInt(day)}`;
+}
+function fmtMonth(d) {
+  if (!d) return '';
+  const [y,m] = d.split('-');
+  return `${y}年${parseInt(m)}月`;
+}
+function getMonth(d) { return d ? d.slice(0,7) : ''; }
+
+/* ===== SEARCH / SORT ===== */
+function hl(text, q) {
+  if (!q || !text) return String(text||'');
+  const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return String(text).replace(new RegExp(safe, 'gi'), m => `<mark>${m}</mark>`);
+}
+function matchSearch(o, q) {
+  if (!q) return true;
+  const ql = q.toLowerCase();
+  const amt = String((o.price||0)*(o.qty||1));
+  return (o.buyer||'').toLowerCase().includes(ql) ||
+    (o.item||'').toLowerCase().includes(ql) ||
+    (o.date||'').includes(ql) ||
+    fmtDate(o.date).includes(ql) ||
+    amt.includes(ql) ||
+    (o.note||'').toLowerCase().includes(ql);
+}
+function getFiltered() { return orders.filter(o => matchSearch(o, searchQuery)); }
+function getSorted(list) {
+  return [...list].sort((a,b) => sortAsc
+    ? (a.date||'').localeCompare(b.date||'')
+    : (b.date||'').localeCompare(a.date||''));
+}
+function toggleSort() {
+  sortAsc = !sortAsc;
+  document.getElementById('sortLabel').textContent = sortAsc ? '古い順' : '新しい順';
+  document.getElementById('sortBtn').classList.toggle('asc', sortAsc);
+  render();
+}
+function onSearch(val) {
+  searchQuery = val.trim();
+  document.getElementById('searchClear').classList.toggle('visible', searchQuery.length > 0);
+  render();
+}
+function clearSearch() {
+  searchQuery = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  render();
+}
+
+/* ===== STATUS ===== */
+function toggleStatus(id, field) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+  o[field] = !o[field];
+  save();
+
+  // DOM部分更新（スクロール位置を保持）
+  // トグルセルだけ更新
+  const fieldIdx = {paid:0, packed:1, sent:2, arrived:3};
+  const cells = document.querySelectorAll(`[data-toggle-id="${id}"]`);
+  cells.forEach(cell => {
+    const f = cell.dataset.toggleField;
+    const type = (f === 'sent' || f === 'arrived') ? 'check' : 'on';
+    cell.innerHTML = markEl(o[f], type);
+  });
+
+  // サマリーバー更新
+  renderSummary();
+
+  // 該当月の未完了バッジだけ更新
+  const m = getMonth(o.date) || 'none';
+  updateMonthBadge(m);
+}
+
+function updateMonthBadge(m) {
+  const sec = document.querySelector(`.month-section[data-month="${m}"]`);
+  if (!sec) return;
+  const isOpen = sec.classList.contains('open');
+  const monthOrders = orders.filter(o => (getMonth(o.date)||'none') === m);
+  const incompleteCount = monthOrders.filter(isIncomplete).length;
+  const badgeEl = sec.querySelector('.incomplete-badge');
+  if (!isOpen && incompleteCount > 0) {
+    if (badgeEl) {
+      badgeEl.textContent = `未完了 ${incompleteCount}件`;
+    } else {
+      const right = sec.querySelector('.month-right');
+      if (right) {
+        const badge = document.createElement('span');
+        badge.className = 'incomplete-badge';
+        badge.textContent = `未完了 ${incompleteCount}件`;
+        right.insertBefore(badge, right.querySelector('.chevron'));
+      }
+    }
+  } else {
+    if (badgeEl) badgeEl.remove();
+  }
+}
+function isIncomplete(o) {
+  return !o.paid || !o.packed || !o.sent || !o.arrived;
+}
+function markEl(on, type) {
+  const cls = type === 'check' ? 'check' : 'on';
+  const sym = type === 'check' ? '✓' : '○';
+  return `<span class="toggle-mark ${on ? cls : ''}">${on ? sym : ''}</span>`;
+}
+
+/* ===== ACCORDION ===== */
+function toggleMonth(m) {
+  openMonths[m] = !openMonths[m];
+  const sec = document.querySelector(`.month-section[data-month="${m}"]`);
+  if (sec) {
+    sec.classList.toggle('open', openMonths[m]);
+    updateMonthBadge(m); // ★この行を追加します
+  }
+}
+
+/* ===== RENDER ===== */
+function renderSummary() {
+  const total = orders.reduce((s,o) => s+(o.price||0)*(o.qty||1), 0);
+  const paid = orders.filter(o=>o.paid).reduce((s,o) => s+(o.price||0)*(o.qty||1), 0);
+  const unpaid = total - paid;
+  const unsent = orders.filter(o=>!o.sent).length;
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="stat"><span class="stat-num">${orders.length}</span><span class="stat-label">件</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">¥${fmt(total)}</span><span class="stat-label">合計金額</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num" style="color:var(--success)">¥${fmt(paid)}</span><span class="stat-label">入金済</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num" style="color:#dc2626">¥${fmt(unpaid)}</span><span class="stat-label">未入金</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num" style="color:var(--warn)">${unsent}</span><span class="stat-label">未発送</span></div>
+  `;
+}
+
+function renderTable(list, q) {
+  let html = `<table><thead><tr>
+    <th>日付</th><th>回数</th><th>購入者</th><th>品名</th>
+    <th>単価</th><th>数量</th><th>金額</th><th>備考</th>
+    <th>入金</th><th>梱包</th><th>発送</th><th>到着</th><th></th>
+  </tr></thead><tbody>`;
+  let prevDate = null;
+  list.forEach(o => {
+    const isNewDate = o.date !== prevDate;
+    prevDate = o.date;
+    const amt = (o.price||0)*(o.qty||1);
+    const isHit = q && matchSearch(o, q);
+    const noteDisplay = o.note
+      ? o.note.replace(/\n/g, '<br>')
+      : '';
+    html += `<tr class="${isNewDate ? 'group-start' : ''} ${isHit && q ? 'highlight' : ''}">
+      <td class="left" style="font-size:12px;color:var(--text-sub)">${isNewDate ? hl(fmtDate(o.date), q) : ''}</td>
+      <td class="center">${o.count||''}</td>
+      <td class="left">${hl(o.buyer||'', q)}</td>
+      <td class="left">${hl(o.item||'', q)}</td>
+      <td class="right">¥${fmt(o.price||0)}</td>
+      <td class="center">${o.qty||1}</td>
+      <td class="right amount">${hl('¥'+fmt(amt), q)}</td>
+      <td class="note-cell">${q ? hl(noteDisplay, q) : noteDisplay}</td>
+      <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="paid" onclick="toggleStatus('${o.id}','paid')">${markEl(o.paid,'on')}</td>
+      <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="packed" onclick="toggleStatus('${o.id}','packed')">${markEl(o.packed,'on')}</td>
+      <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="sent" onclick="toggleStatus('${o.id}','sent')">${markEl(o.sent,'check')}</td>
+      <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="arrived" onclick="toggleStatus('${o.id}','arrived')">${markEl(o.arrived,'check')}</td>
+      <td class="actions"><button class="row-action-btn" onclick="openEdit('${o.id}')">…</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function render() {
+  renderSummary();
+  const filtered = getFiltered();
+  const sorted = getSorted(filtered);
+  const content = document.getElementById('mainContent');
+  const empty = document.getElementById('emptyState');
+
+  if (sorted.length === 0) {
+    content.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('emptyMsg').textContent = searchQuery ? '検索結果がありません' : '受注データがありません';
+    document.getElementById('emptySubMsg').textContent = searchQuery ? `「${searchQuery}」に一致するデータがありません` : '「新規登録」から追加してください';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Group by month
+  const months = {};
+  const seenMonths = [];
+  sorted.forEach(o => {
+    const m = getMonth(o.date) || 'none';
+    if (!months[m]) { months[m] = []; seenMonths.push(m); }
+    months[m].push(o);
+  });
+
+  // Auto-open latest month on first render
+  if (Object.keys(openMonths).length === 0 && seenMonths.length > 0) {
+    openMonths[seenMonths[0]] = true;
+  }
+
+  let html = '';
+  seenMonths.forEach(m => {
+    const list = months[m];
+    const monthTotal = list.reduce((s,o) => s+(o.price||0)*(o.qty||1), 0);
+    const label = m === 'none' ? '日付なし' : fmtMonth(m + '-01');
+    const incompleteCount = list.filter(isIncomplete).length;
+    const isOpen = !!openMonths[m];
+    const badgeHtml = (!isOpen && incompleteCount > 0)
+      ? `<span class="incomplete-badge">未完了 ${incompleteCount}件</span>` : '';
+    const escapedM = m.replace(/"/g, '&quot;');
+    html += `<div class="month-section ${isOpen ? 'open' : ''}" data-month="${escapedM}">
+      <div class="month-toggle" onclick="toggleMonth('${escapedM}')">
+        <div class="month-left">
+          <span class="month-title">${label}</span>
+          <span class="month-sub">${list.length}件 ／ ¥${fmt(monthTotal)}</span>
+        </div>
+        <div class="month-right">
+          ${badgeHtml}
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+      <div class="month-body">
+        <div class="table-wrap">${renderTable(list, searchQuery)}</div>
+      </div>
+    </div>`;
+  });
+  content.innerHTML = html;
+}
+
+/* ===== ORDER MODAL ===== */
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(80, el.scrollHeight) + 'px';
+}
+
+function openModal(id) {
+  editId = id || null;
+  const title = document.getElementById('modalTitle');
+  const footer = document.getElementById('modalFooter');
+  if (editId) {
+    const o = orders.find(o => o.id === editId);
+    title.textContent = '編集';
+    document.getElementById('f-date').value = o.date||'';
+    document.getElementById('f-buyer').value = o.buyer||'';
+    document.getElementById('f-count').value = o.count||'';
+    document.getElementById('f-item').value = o.item||'';
+    document.getElementById('f-price').value = o.price||'';
+    document.getElementById('f-qty').value = o.qty||1;
+    const ta = document.getElementById('f-note');
+    ta.value = o.note||'';
+    setTimeout(() => autoResize(ta), 0);
+    footer.innerHTML = `
+      <button class="btn-delete" onclick="deleteOrder()">削除</button>
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveOrder()">保存</button>`;
+  } else {
+    title.textContent = '新規登録';
+    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('f-buyer').value = '';
+    document.getElementById('f-count').value = '';
+    document.getElementById('f-item').value = '';
+    document.getElementById('f-price').value = '';
+    document.getElementById('f-qty').value = 1;
+    const ta = document.getElementById('f-note');
+    ta.value = '';
+    ta.style.height = '80px';
+    footer.innerHTML = `
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveOrder()">保存</button>`;
+  }
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-buyer').focus(), 100);
+}
+function openEdit(id) { openModal(id); }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function onOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+
+function saveOrder() {
+  const date = document.getElementById('f-date').value;
+  const buyer = document.getElementById('f-buyer').value.trim();
+  const item = document.getElementById('f-item').value.trim();
+  if (!date || !buyer || !item) { alert('日付・購入者・品名は必須です'); return; }
+  const data = {
+    date, buyer,
+    count: document.getElementById('f-count').value || '',
+    item,
+    price: parseInt(document.getElementById('f-price').value)||0,
+    qty: parseInt(document.getElementById('f-qty').value)||1,
+    note: document.getElementById('f-note').value.trim(),
+  };
+  if (editId) {
+    Object.assign(orders.find(o => o.id === editId), data);
+  } else {
+    const m = getMonth(date) || 'none';
+    openMonths[m] = true;
+    orders.push({ id: uid(), paid:false, packed:false, sent:false, arrived:false, ...data });
+  }
+  save(); closeModal(); render();
+}
+function deleteOrder() {
+  if (!confirm('この受注を削除しますか？')) return;
+  orders = orders.filter(o => o.id !== editId);
+  save(); closeModal(); render();
+}
+
+/* ===== SETTINGS ===== */
+function openSettings() { document.getElementById('settingsOverlay').classList.add('open'); }
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
+function onSettingsOverlayClick(e) { if (e.target === document.getElementById('settingsOverlay')) closeSettings(); }
+
+function exportCSV() {
+  const header = ['日付','回数','購入者','品名','単価','数量','金額','備考','入金','梱包','発送','到着'];
+  const rows = orders.map(o => [
+    o.date||'', o.count||'', o.buyer||'', o.item||'',
+    o.price||0, o.qty||1, (o.price||0)*(o.qty||1), o.note||'',
+    o.paid?'○':'', o.packed?'○':'', o.sent?'✓':'', o.arrived?'✓':''
+  ]);
+  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `受注管理_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  closeSettings();
+}
+
+function backupData() {
+  const json = JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), orders }, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `受注管理_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  closeSettings();
+}
+
+function restoreData() {
+  document.getElementById('restoreFileInput').click();
+}
+function onRestoreFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const restored = data.orders || data;
+      if (!Array.isArray(restored)) throw new Error('invalid');
+      if (!confirm(`${restored.length}件のデータを復元します。現在のデータは上書きされます。`)) return;
+      orders = restored;
+      openMonths = {};
+      save(); closeSettings(); render();
+      alert('復元が完了しました。');
+    } catch(err) {
+      alert('ファイルの読み込みに失敗しました。正しいバックアップファイルを選択してください。');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function deleteAllData() {
+  if (!confirm('全データを削除しますか？この操作は元に戻せません。')) return;
+  orders = []; openMonths = {};
+  save(); closeSettings(); render();
+}
+
+/* ===== INIT ===== */
+load();
+if (orders.length === 0) {
+  orders = [
+    {id:uid(),date:'2026-05-01',count:'',buyer:'山田',item:'アクセサリー',price:5000,qty:1,note:'予約',paid:true,packed:false,sent:false,arrived:false},
+    {id:uid(),date:'2026-05-20',count:'',buyer:'田中',item:'ピアス',price:2500,qty:2,note:'',paid:true,packed:true,sent:false,arrived:false},
+    {id:uid(),date:'2026-05-20',count:'',buyer:'',item:'資材',price:3000,qty:1,note:'100個/1ロット',paid:true,packed:true,sent:true,arrived:true},
+    {id:uid(),date:'2026-05-21',count:'2',buyer:'山田',item:'アクセサリー',price:2500,qty:1,note:'',paid:true,packed:false,sent:false,arrived:false},
+    {id:uid(),date:'2026-05-30',count:'',buyer:'佐藤',item:'布',price:2000,qty:2,note:'',paid:false,packed:false,sent:false,arrived:false},
+    {id:uid(),date:'2026-06-03',count:'',buyer:'山田',item:'ネックレス',price:6000,qty:1,note:'受注確定後に連絡あり\nサイズ変更希望',paid:false,packed:false,sent:false,arrived:false},
+    {id:uid(),date:'2026-06-10',count:'',buyer:'佐藤',item:'ピアス',price:2500,qty:3,note:'',paid:true,packed:true,sent:true,arrived:false},
+  ];
+  save();
+}
+render();
+</script>
+</body>
+</html>
