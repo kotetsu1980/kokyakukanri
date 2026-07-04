@@ -200,11 +200,9 @@ td.actions { padding: 0; min-width: 40px; }
 .btn-save { width: 100%; background: var(--accent); border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: opacity 0.15s; }
 .btn-save:active { opacity: 0.9; }
 
-/* 連続入力（同名）は Indigo色ベース */
 .btn-continue { width: 100%; background: var(--accent-bg); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 10px; padding: 12px; font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer; transition: background 0.15s; }
 .btn-continue:active { background: rgba(79, 70, 229, 0.15); }
 
-/* 連続入力（別名）は 落ち着いたグレー色ベース */
 .btn-continue-diff { width: 100%; background: #f1f5f9; border: 1px solid var(--border-strong); border-radius: 10px; padding: 12px; font-size: 12px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: background 0.15s; }
 .btn-continue-diff:active { background: #e2e8f0; }
 
@@ -308,7 +306,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     <div class="modal-body">
       <div class="form-row">
         <label>日付</label>
-        <input type="date" id="f-date">
+        <input type="date" id="f-date" onchange="suggestCount(document.getElementById('f-buyer').value)">
       </div>
       <div class="form-row-2">
         <div class="form-row" style="margin:0">
@@ -422,28 +420,94 @@ function showToast(msg) {
   }, 2200);
 }
 
-/* ===== AUTO-INCREMENT LOGIC ===== */
+/* ===== 時系列リナンバー ＆ 同日判定ロジック (CHRONOLOGICAL AUTO-RECALCULATE) ===== */
+
+// 1. 保存や削除が発生するたびに、裏側で全購入者の回数を時系列順に「1から振り直す」関数
+function recalculateAllCounts() {
+  // 購入者名ごとにデータをグループ化（空欄は除外）
+  const groups = {};
+  orders.forEach(o => {
+    const b = (o.buyer || '').trim();
+    if (!b) return;
+    if (!groups[b]) groups[b] = [];
+    groups[b].push(o);
+  });
+
+  // 各グループ内で古い日付順にソートし、回数を上書き再設定
+  for (const buyer in groups) {
+    const buyerOrders = groups[buyer];
+    
+    // 日付順（古い順）に並び替え
+    buyerOrders.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    
+    // 日付ごとに再度グループ化（同一日の重複をまとめるため）
+    const dateGroups = [];
+    const dateMap = {};
+    buyerOrders.forEach(o => {
+      const d = o.date || 'none';
+      if (!dateMap[d]) {
+        dateMap[d] = [];
+        dateGroups.push({ date: d, list: dateMap[d] });
+      }
+      dateMap[d].push(o);
+    });
+
+    // 登場した日付順に「回数」を決定（初回のみ空、2回目以降は2, 3...）
+    if (dateGroups.length <= 1) {
+      // 日付が1日しかない場合は「初回」扱いで全員を空欄にする
+      buyerOrders.forEach(o => {
+        o.count = '';
+      });
+    } else {
+      // 複数日ある場合は、古い日のグループから連番
+      dateGroups.forEach((group, index) => {
+        const countValue = index === 0 ? '' : (index + 1);
+        group.list.forEach(o => {
+          o.count = countValue;
+        });
+      });
+    }
+  }
+}
+
+// 2. 新規入力時に、選択した「日付」と「購入者」から、現在の予定回数を割り出す関数
 function suggestCount(name) {
-  if (editId) return; // 編集時は自動計算を行わない
+  if (editId) return; // 編集時は自動入力しない
   const val = name.trim();
+  const date = document.getElementById('f-date').value;
   const countInput = document.getElementById('f-count');
   
-  if (!val) {
+  if (!val || !date) {
     countInput.value = '';
     return;
   }
   
-  const matchOrders = orders.filter(o => (o.buyer || '').trim() === val);
+  // 過去のこの購入者の異なる日付リストを抽出
+  const existingDates = [...new Set(
+    orders
+      .filter(o => (o.buyer || '').trim() === val)
+      .map(o => o.date)
+      .filter(Boolean)
+  )];
   
-  if (matchOrders.length > 0) {
-    let max = 1;
-    matchOrders.forEach(o => {
-      const c = parseInt(o.count) || 1;
-      if (c > max) max = c;
-    });
-    countInput.value = max + 1;
+  // 【要件1: 同日同名購入判定】
+  // すでに同日に登録があれば、過去データの回数をそのまま引き継ぎ（ステイ）
+  if (existingDates.includes(date)) {
+    const sameDayOrder = orders.find(o => (o.buyer || '').trim() === val && o.date === date);
+    countInput.value = sameDayOrder ? sameDayOrder.count : '';
+    return;
+  }
+  
+  // 【要件2: 過去の割り込み挿入判定】
+  // 入力中の日付（例:5/3）を、既存の日付リスト（例:[5/1, 5/5]）に仮追加し、時系列で並び替えた際の位置を特定する
+  const tempDates = [...existingDates, date].sort();
+  const index = tempDates.indexOf(date);
+  
+  if (tempDates.length <= 1) {
+    countInput.value = ''; // 履歴が完全に新規の場合は空欄
   } else {
-    countInput.value = '';
+    // 挿入された日付順に基づく回数を予測 (最初の日の場合は空、それ以外はインデックス+1)
+    countInput.value = index === 0 ? '' : (index + 1);
   }
 }
 
@@ -488,7 +552,7 @@ function clearSearch() {
   render();
 }
 
-/* ===== STATUS (TAP SCROLL LOCK REMOVED - JOUBU SHUUSEI) ===== */
+/* ===== STATUS ===== */
 function toggleStatus(id, field) {
   const o = orders.find(o => o.id === id);
   if (!o) return;
@@ -510,8 +574,7 @@ function toggleStatus(id, field) {
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
   
-  // 4. 【スクロール跳ね返り防止の要】
-  // render()を丸ごと呼び出すのではなく、対象の行（TR）の「購入者セル」だけを部分更新する
+  // 4. 部分的な完了バッジ更新（画面スクロール跳ね返りの防止）
   const isCompleted = !isIncomplete(o);
   const firstCell = document.querySelector(`[data-toggle-id="${id}"]`);
   if (firstCell) {
@@ -519,11 +582,9 @@ function toggleStatus(id, field) {
     if (tr) {
       const buyerTd = tr.querySelector('.buyer-cell');
       if (buyerTd) {
-        // すでにある完了バッジを一旦削除
         const existingBadge = buyerTd.querySelector('.kanryo-badge');
         if (existingBadge) existingBadge.remove();
         
-        // すべて完了した場合は、新しく完了バッジを挿入する
         if (isCompleted) {
           buyerTd.insertAdjacentHTML('afterbegin', '<span class="kanryo-badge">完了</span>');
         }
@@ -614,7 +675,6 @@ function renderTable(list, q) {
     html += `<tr class="${isNewDate ? 'group-start' : ''} ${isHit && q ? 'highlight' : ''}">
       <td class="left" style="font-size:11px;color:var(--text-sub);font-weight:500;">${isNewDate ? hl(fmtDate(o.date), q) : ''}</td>
       <td class="center">${o.count||''}</td>
-      <!-- 部分更新のため、class="buyer-cell" を追記 -->
       <td class="left buyer-cell" style="font-weight:600; text-align: left; vertical-align: middle;">
         ${kanryoBadge}${hl(o.buyer||'', q)}
       </td>
@@ -728,7 +788,6 @@ function openModal(id) {
     ta.value = '';
     ta.style.height = '80px';
     
-    // ご要望の4種類の動作に対応したボタン配置にアップデート
     footer.innerHTML = `
       <div class="footer-grid-new">
         <button class="btn-save" onclick="saveOrder('close')">保存</button>
@@ -747,7 +806,6 @@ function openEdit(id) { openModal(id); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 function onOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
-// continueInput 引数をモード判定（'close' | 'same' | 'different'）に変更
 function saveOrder(mode = 'close') {
   const date = document.getElementById('f-date').value;
   const buyer = document.getElementById('f-buyer').value.trim();
@@ -758,7 +816,7 @@ function saveOrder(mode = 'close') {
   
   const data = {
     date, buyer,
-    count, // 入力欄にある数値をそのまま引き継ぐ
+    count, 
     item,
     price: parseInt(document.getElementById('f-price').value)||0,
     qty: parseInt(document.getElementById('f-qty').value)||1,
@@ -773,17 +831,23 @@ function saveOrder(mode = 'close') {
     orders.push({ id: uid(), paid:false, packed:false, sent:false, arrived:false, ...data });
   }
   
+  // ★保存時に、すべての購入者の全履歴データを時系列順（日付順）に再配列して回数を振り直す
+  recalculateAllCounts();
+  
   save(); 
   render();
   
   if (mode === 'same') {
-    // 【連続入力（同名）】: 日付、購入者名、回数をそのまま維持（回数は増やさずステイ）
+    // 【連続入力（同名）】: 日付、購入者名、回数はそのままステイ
     document.getElementById('f-item').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-qty').value = 1;
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
+    
+    // 現在保存されているデータを時系列ソートした上での最新の回数を再算出（バグ防止）
+    suggestCount(buyer);
     
     showToast('同名として保存しました。品名を入力してください。');
     document.getElementById('f-item').focus();
@@ -803,7 +867,6 @@ function saveOrder(mode = 'close') {
     document.getElementById('f-buyer').focus();
     
   } else {
-    // 通常の保存時は画面を閉じる
     closeModal();
   }
 }
@@ -811,6 +874,10 @@ function saveOrder(mode = 'close') {
 function deleteOrder() {
   if (!confirm('この受注を削除しますか？')) return;
   orders = orders.filter(o => o.id !== editId);
+  
+  // ★削除時も、残ったデータに対して購入者ごとの回数を古い順に自動振り直し
+  recalculateAllCounts();
+  
   save(); closeModal(); render();
 }
 
@@ -861,6 +928,10 @@ function onRestoreFile(e) {
       if (!confirm(`${restored.length}件のデータを復元します。現在のデータは上書きされます。`)) return;
       orders = restored;
       openMonths = {};
+      
+      // ★バックアップからの復元時にも、すべてのデータの整合性を整えるためリナンバーを実行
+      recalculateAllCounts();
+      
       save(); closeSettings(); render();
       alert('復元が完了しました。');
     } catch(err) {
@@ -891,6 +962,9 @@ if (orders.length === 0) {
   ];
   save();
 }
+
+// 初期起動時にもデモデータ等の整合性をあわせるため自動計算を実行
+recalculateAllCounts();
 render();
 </script>
 </body>
