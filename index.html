@@ -23,7 +23,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, 'Hiragino Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; }
 
-/* ===== CENTRAL APP CONTAINER (CHUO-ZOE) ===== */
+/* ===== CENTRAL APP CONTAINER ===== */
 @media (min-width: 640px) {
   body {
     background: #f1f5f9;
@@ -154,6 +154,20 @@ tr.highlight td { background: var(--warn-bg) !important; }
 td.actions { padding: 0; min-width: 40px; }
 .row-action-btn { background: none; border: none; cursor: pointer; padding: 10px; color: var(--text-sub); font-size: 16px; display: block; width: 100%; height: 100%; }
 
+/* ===== KANRYO BADGE STYLE ===== */
+.kanryo-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 /* ===== EMPTY ===== */
 .empty { text-align: center; padding: 64px 20px; color: var(--text-sub); }
 .empty svg { width: 44px; height: 44px; margin-bottom: 12px; opacity: 0.3; color: var(--accent); }
@@ -178,7 +192,7 @@ td.actions { padding: 0; min-width: 40px; }
 .auto-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ===== MODAL FOOTER BUTTONS (CONTINUOUS INPUT SUPPORT) ===== */
+/* ===== MODAL FOOTER BUTTONS ===== */
 .modal-footer { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); background: #f8fafc; }
 .footer-row-primary { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 10px; }
 .btn-cancel { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: background 0.15s; }
@@ -290,8 +304,11 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
         <input type="date" id="f-date">
       </div>
       <div class="form-row-2">
-        <div class="form-row" style="margin:0"><label>購入者</label><input type="text" id="f-buyer" placeholder="山田"></div>
-        <div class="form-row" style="margin:0"><label>回数 (任意)</label><input type="number" id="f-count" placeholder="" min="1"></div>
+        <div class="form-row" style="margin:0">
+          <label>購入者</label>
+          <input type="text" id="f-buyer" placeholder="山田" oninput="suggestCount(this.value)">
+        </div>
+        <div class="form-row" style="margin:0"><label>回数 (自動算出)</label><input type="number" id="f-count" placeholder="" min="1"></div>
       </div>
       <div class="form-row" style="margin-top:14px">
         <label>品名</label>
@@ -307,7 +324,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       </div>
     </div>
     <div class="modal-footer" id="modalFooter">
-      <!-- JavaScriptで書き換えられます -->
+      <!-- JSでボタンが動的に挿入されます -->
     </div>
   </div>
 </div>
@@ -398,6 +415,35 @@ function showToast(msg) {
   }, 2200);
 }
 
+/* ===== AUTO-INCREMENT LOGIC (KAISU JIDOU SANSHUTSU) ===== */
+function suggestCount(name) {
+  if (editId) return; // 編集時は自動計算を行わない
+  const val = name.trim();
+  const countInput = document.getElementById('f-count');
+  
+  if (!val) {
+    countInput.value = '';
+    return;
+  }
+  
+  // 同姓同名の過去の全受注を抽出
+  const matchOrders = orders.filter(o => (o.buyer || '').trim() === val);
+  
+  if (matchOrders.length > 0) {
+    let max = 1;
+    matchOrders.forEach(o => {
+      // 過去データに回数の入力がない場合は「1回目」として扱う
+      const c = parseInt(o.count) || 1;
+      if (c > max) max = c;
+    });
+    // 過去履歴の最大値に +1 をしてセット
+    countInput.value = max + 1;
+  } else {
+    // 過去に履歴がない場合は初回のため「空白」にする
+    countInput.value = '';
+  }
+}
+
 /* ===== SEARCH / SORT ===== */
 function hl(text, q) {
   if (!q || !text) return String(text||'');
@@ -457,6 +503,9 @@ function toggleStatus(id, field) {
 
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
+  
+  // ステータス変更時に完了バッジをリアルタイムで再判定・表示するために部分レンダリング
+  render(); 
 }
 
 function updateMonthBadge(m) {
@@ -508,7 +557,7 @@ function renderSummary() {
   const unpaid = total - paid;
   const unsent = orders.filter(o=>!o.sent).length;
   
-  // スマホ画面でも1画面内に収まるように divider を省き簡素化
+  // はみ出さずにすっきり見せる配置
   document.getElementById('summaryBar').innerHTML = `
     <div class="stat"><span class="stat-num">${orders.length}</span><span class="stat-label">件数</span></div>
     <div class="stat-divider"></div>
@@ -534,13 +583,18 @@ function renderTable(list, q) {
     prevDate = o.date;
     const amt = (o.price||0)*(o.qty||1);
     const isHit = q && matchSearch(o, q);
-    const noteDisplay = o.note
-      ? o.note.replace(/\n/g, '<br>')
-      : '';
+    const noteDisplay = o.note ? o.note.replace(/\n/g, '<br>') : '';
+    
+    // 入金〜到着まで全て完了している場合のバッジ（4つともtrue）
+    const isCompleted = !isIncomplete(o);
+    const kanryoBadge = isCompleted ? `<span class="kanryo-badge">完了</span>` : '';
+    
     html += `<tr class="${isNewDate ? 'group-start' : ''} ${isHit && q ? 'highlight' : ''}">
       <td class="left" style="font-size:11px;color:var(--text-sub);font-weight:500;">${isNewDate ? hl(fmtDate(o.date), q) : ''}</td>
       <td class="center">${o.count||''}</td>
-      <td class="left" style="font-weight:500;">${hl(o.buyer||'', q)}</td>
+      <td class="left" style="font-weight:600; text-align: left; vertical-align: middle;">
+        ${kanryoBadge}${hl(o.buyer||'', q)}
+      </td>
       <td class="left">${hl(o.item||'', q)}</td>
       <td class="right">¥${fmt(o.price||0)}</td>
       <td class="center">${o.qty||1}</td>
@@ -581,9 +635,9 @@ function render() {
     months[m].push(o);
   });
 
-  if (Object.keys(openMonths).length === 0 && seenMonths.length > 0) {
-    openMonths[seenMonths[0]] = true;
-  }
+  // 【初期時にアコーディオンをすべて閉じる修正】
+  // openMonths が未設定かつ初回レンダリング時は、デフォルトで「開く」処理をスキップ
+  // これにより起動時はすべての月のアコーディオンが閉じた状態になります。
 
   let html = '';
   seenMonths.forEach(m => {
@@ -592,8 +646,7 @@ function render() {
     const label = m === 'none' ? '日付なし' : fmtMonth(m + '-01');
     const incompleteCount = list.filter(isIncomplete).length;
     const isOpen = !!openMonths[m];
-    const badgeHtml = (!isOpen && incompleteCount > 0)
-      ? `<span class="incomplete-badge">未完了 ${incompleteCount}件</span>` : '';
+    const badgeHtml = (!isOpen && incompleteCount > 0) ? `<span class="incomplete-badge">未完了 ${incompleteCount}件</span>` : '';
     const escapedM = m.replace(/"/g, '&quot;');
     html += `<div class="month-section ${isOpen ? 'open' : ''}" data-month="${escapedM}">
       <div class="month-toggle" onclick="toggleMonth('${escapedM}')">
@@ -638,7 +691,6 @@ function openModal(id) {
     ta.value = o.note||'';
     setTimeout(() => autoResize(ta), 0);
     
-    // 編集時は「削除」「キャンセル」「保存」の並び
     footer.innerHTML = `
       <div class="footer-row-primary">
         <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
@@ -657,7 +709,6 @@ function openModal(id) {
     ta.value = '';
     ta.style.height = '80px';
     
-    // 新規登録時はご要望の「保存」「保存後 連続入力」「キャンセル」ボタンを配置
     footer.innerHTML = `
       <div class="footer-row-primary">
         <button class="btn-continue" onclick="saveOrder(true)">保存後 連続入力</button>
@@ -673,7 +724,6 @@ function openEdit(id) { openModal(id); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 function onOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
-// 連続入力をサポートするように引数を追加
 function saveOrder(continueInput = false) {
   const date = document.getElementById('f-date').value;
   const buyer = document.getElementById('f-buyer').value.trim();
@@ -694,6 +744,7 @@ function saveOrder(continueInput = false) {
     Object.assign(orders.find(o => o.id === editId), data);
   } else {
     const m = getMonth(date) || 'none';
+    // 連続入力された月のアコーディオンは開いた状態にしておく
     openMonths[m] = true;
     orders.push({ id: uid(), paid:false, packed:false, sent:false, arrived:false, ...data });
   }
@@ -702,18 +753,18 @@ function saveOrder(continueInput = false) {
   render();
   
   if (continueInput) {
-    // 連続入力：品名、単価、数量、備考、回数をリセット。日付と購入者は残す。
+    // 連続入力時: 品名、金額、数量、備考、回数をクリア（日付、購入者は維持）
     document.getElementById('f-item').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-qty').value = 1;
-    document.getElementById('f-count').value = '';
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
     
-    showToast('受注を保存しました。続けて入力できます。');
+    // 同じ購入者の次回の「回数」を自動再計算してセット
+    suggestCount(buyer);
     
-    // 次にフォーカスが当たると便利な「品名」欄にフォーカスを当てる
+    showToast('受注を保存しました。続けて入力できます。');
     document.getElementById('f-item').focus();
   } else {
     closeModal();
