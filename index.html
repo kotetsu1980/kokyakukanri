@@ -86,7 +86,7 @@ header h1 { font-size: 17px; font-weight: 700; color: var(--text); letter-spacin
 .gear-btn:active { background: var(--bg); }
 .gear-btn svg { width: 18px; height: 18px; }
 
-/* ===== SUMMARY ===== */
+/* ===== SUMMARY (NO SCROLL, AUTO-FIT) ===== */
 .summary { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 4px; }
 .stat { display: flex; flex-direction: column; align-items: center; flex: 1 1 0; text-align: center; }
 .stat-num { font-size: 15px; font-weight: 700; color: var(--text); }
@@ -280,7 +280,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <button class="gear-btn" onclick="openSettings()" aria-label="設定">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51(1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
     </div>
@@ -360,9 +360,9 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
   </div>
 </div>
 
-<!-- 画像拡大プレビューモーダル（画面中央表示） -->
+<!-- 画像拡大プレビューモーダル（引き延ばしを防ぐ最大240pxの実寸幅に制限） -->
 <div class="overlay" id="imgOverlay" onclick="closeImgPreview()" style="justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.75);">
-  <img id="enlargedImg" src="" style="max-width: 90%; max-height: 85vh; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain;">
+  <img id="enlargedImg" src="" style="width: 100%; max-width: 240px; max-height: 85vh; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain;">
 </div>
 
 <!-- 設定モーダル -->
@@ -513,14 +513,14 @@ function suggestCount(name) {
       .filter(Boolean)
   )];
   
-  // 【同日同名判定】: すでに同日に入力があれば、その日の回数に固定（ステイ）
+  // 【同日同名判定】: 同日に履歴があれば回数を固定
   if (existingDates.includes(date)) {
     const sameDayOrder = orders.find(o => (o.buyer || '').trim() === val && o.date === date);
     countInput.value = sameDayOrder ? sameDayOrder.count : '';
     return;
   }
   
-  // 【過去の割り込み判定】: 入力中の日付を既存の日付に差し込んで、古い順から何番目になるかを計算
+  // 【過去の割り込み判定】: 時系列の順序に基づく回数を推測
   const tempDates = [...existingDates, date].sort();
   const index = tempDates.indexOf(date);
   
@@ -531,7 +531,7 @@ function suggestCount(name) {
   }
 }
 
-/* ===== IMAGE HANDLE & COMPRESS (1,000枚以上保存可能な圧縮設定に調整済) ===== */
+/* ===== IMAGE HANDLE & COMPRESS (クッキリ表示と軽さの両立設定) ===== */
 function onImageSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -540,10 +540,10 @@ function onImageSelected(e) {
   reader.onload = function(event) {
     const img = new Image();
     img.onload = function() {
-      // 1,000枚以上保存できるようにリサイズの上限サイズを150pxに圧縮
+      // 軽さを保ちつつクッキリさせるために、横幅最大「240px」に調整
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 150;
-      const MAX_HEIGHT = 150;
+      const MAX_WIDTH = 240;
+      const MAX_HEIGHT = 240;
       let width = img.width;
       let height = img.height;
       
@@ -564,8 +564,8 @@ function onImageSelected(e) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
       
-      // 画質を40%に調整して容量を4KB前後に圧縮（1,000枚以上の登録に対応）
-      tempImageData = canvas.toDataURL('image/jpeg', 0.4);
+      // 画質を55%に微調整。1枚あたり「約6KB〜8KB」になり、700枚近い保存容量を維持します
+      tempImageData = canvas.toDataURL('image/jpeg', 0.55);
       
       const preview = document.getElementById('modal-img-preview');
       preview.src = tempImageData;
@@ -658,7 +658,6 @@ function toggleStatus(id, field) {
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
   
-  // 部分書き換え処理により、テーブルのスクロール位置を完全に維持
   const isCompleted = !isIncomplete(o);
   const firstCell = document.querySelector(`[data-toggle-id="${id}"]`);
   if (firstCell) {
