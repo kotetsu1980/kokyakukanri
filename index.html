@@ -222,6 +222,18 @@ td.actions { padding: 0; min-width: 40px; }
 
 .btn-delete { width: 100%; background: #fee2e2; border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 600; color: #dc2626; cursor: pointer; }
 
+/* フッターボタン用のレイアウト配置と余白設定 */
+.footer-row-primary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.footer-grid-new {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 /* ===== TOAST NOTIFICATION ===== */
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 100px);
@@ -318,7 +330,8 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-row">
+      <!-- 日付入力幅の調整（max-widthを追加） -->
+      <div class="form-row" style="max-width: 200px;">
         <label>日付</label>
         <input type="date" id="f-date" onchange="suggestCount(document.getElementById('f-buyer').value)">
       </div>
@@ -415,11 +428,8 @@ let openMonths = {};
 let sortAsc = false;
 
 // ===== 画像の一時保管用（保存確定前のステージング）=====
-// 新しく選んだ画像（{thumb: Blob, full: Blob}）。未選択ならnull
 let tempImageBlobs = null;
-// 編集中に「削除」が押されたかどうか
 let imageRemoved = false;
-// サムネイル/拡大画像のObjectURLキャッシュ（同じ画像を何度も読み込まないため）
 const thumbUrlCache = new Map();
 const fullUrlCache = new Map();
 
@@ -431,7 +441,7 @@ function hideSplash() {
   setTimeout(() => s.style.display = 'none', 500);
 }
 
-/* ===== STORAGE (注文データ本体は今まで通りlocalStorage) ===== */
+/* ===== STORAGE ===== */
 async function load() {
   try { orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { orders = []; }
   await migrateLegacyImages();
@@ -439,7 +449,7 @@ async function load() {
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-/* ===== IMAGE STORAGE (画像だけはIndexedDBへ。容量上限が桁違いに大きい) ===== */
+/* ===== IMAGE STORAGE (IndexedDB) ===== */
 const IMG_DB_NAME = 'orderImagesDB';
 const IMG_STORE = 'images';
 let imgDBPromise = null;
@@ -491,10 +501,10 @@ async function idbClearAll() {
   });
 }
 
-/* ===== IMAGE RESIZE HELPERS (サムネイル用と拡大表示用の2サイズを生成) ===== */
-const THUMB_MAX_SIDE = 160;   // 一覧の34px角サムネイル用（Retinaでも十分な余裕を持たせる）
+/* ===== IMAGE RESIZE HELPERS ===== */
+const THUMB_MAX_SIDE = 160;
 const THUMB_QUALITY = 0.65;
-const FULL_MAX_SIDE = 1000;   // 拡大表示用（スマホ画面幅いっぱいに広げてもジャギらないサイズ）
+const FULL_MAX_SIDE = 1000;
 const FULL_QUALITY = 0.75;
 
 function fileToImage(file) {
@@ -551,7 +561,7 @@ async function makeThumbAndFull(img) {
   return { thumb, full };
 }
 
-/* ===== 旧バージョン（base64を1枚だけ保存）からの自動移行 ===== */
+/* ===== 旧バージョンからの自動移行 ===== */
 async function migrateLegacyImages() {
   let changed = false;
   for (const o of orders) {
@@ -595,7 +605,7 @@ function showToast(msg) {
   }, 2200);
 }
 
-/* ===== 時系列リナンバー ＆ 同日判定ロジック ===== */
+/* ===== 時系列リナンバー ＆ 同日判定 ===== */
 function recalculateAllCounts() {
   const groups = {};
   orders.forEach(o => {
@@ -607,7 +617,6 @@ function recalculateAllCounts() {
 
   for (const buyer in groups) {
     const buyerOrders = groups[buyer];
-    
     buyerOrders.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     
     const dateGroups = [];
@@ -654,14 +663,12 @@ function suggestCount(name) {
       .filter(Boolean)
   )];
   
-  // 【同日同名判定】: 同日に履歴があれば回数を固定
   if (existingDates.includes(date)) {
     const sameDayOrder = orders.find(o => (o.buyer || '').trim() === val && o.date === date);
     countInput.value = sameDayOrder ? sameDayOrder.count : '';
     return;
   }
   
-  // 【過去の割り込み判定】: 時系列の順序に基づく回数を推測
   const tempDates = [...existingDates, date].sort();
   const index = tempDates.indexOf(date);
   
@@ -672,7 +679,7 @@ function suggestCount(name) {
   }
 }
 
-/* ===== IMAGE HANDLE & COMPRESS (サムネイル用・拡大表示用を別々に生成) ===== */
+/* ===== IMAGE HANDLE & COMPRESS ===== */
 async function onImageSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -1014,7 +1021,7 @@ function openModal(id) {
     setTimeout(() => autoResize(ta), 0);
     
     if (o.hasImage) {
-      imageRemoved = false; // 既存画像は明示的に「削除」を押すまでは維持する
+      imageRemoved = false;
       const preview = document.getElementById('modal-img-preview');
       idbGet(o.id + '_thumb').then(blob => {
         if (!blob) return;
@@ -1028,11 +1035,13 @@ function openModal(id) {
     }
     
     footer.innerHTML = `
-      <div class="footer-row-primary">
-        <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-        <button class="btn-save" onclick="saveOrder('close')">保存</button>
-      </div>
-      <button class="btn-delete" onclick="deleteOrder()">削除</button>`;
+      <div class="footer-grid-new">
+        <div class="footer-row-primary">
+          <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+          <button class="btn-save" onclick="saveOrder('close')">保存</button>
+        </div>
+        <button class="btn-delete" onclick="deleteOrder()">削除</button>
+      </div>`;
   } else {
     title.textContent = '新規登録';
     document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
@@ -1047,12 +1056,14 @@ function openModal(id) {
     
     footer.innerHTML = `
       <div class="footer-grid-new">
-        <button class="btn-save" onclick="saveOrder('close')">保存</button>
+        <div class="footer-row-primary">
+          <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+          <button class="btn-save" onclick="saveOrder('close')">保存</button>
+        </div>
         <div class="footer-row-split">
           <button class="btn-continue" onclick="saveOrder('same')">連続入力(同名)</button>
           <button class="btn-continue-diff" onclick="saveOrder('different')">連続入力(別名)</button>
         </div>
-        <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       </div>`;
   }
   document.getElementById('overlay').classList.add('open');
@@ -1102,7 +1113,7 @@ async function saveOrder(mode = 'close') {
       fullUrlCache.delete(orderId);
     } catch(err) {
       console.error(err);
-      alert('画像の保存に失敗しました（保存容量が不足している可能性があります）');
+      alert('画像の保存に失敗しました');
     }
   } else if (imageRemoved && order.hasImage) {
     await idbDelete(orderId + '_thumb').catch(()=>{});
@@ -1113,7 +1124,6 @@ async function saveOrder(mode = 'close') {
   }
   
   recalculateAllCounts();
-  
   save(); 
   render();
   
@@ -1164,7 +1174,6 @@ async function deleteOrder() {
   }
   
   recalculateAllCounts();
-  
   save(); closeModal(); render();
 }
 
@@ -1175,12 +1184,14 @@ function onSettingsOverlayClick(e) { if (e.target === document.getElementById('s
 
 function exportCSV() {
   const header = ['日付','回数','購入者','品名','単価','数量','金額','備考','入金','梱包','発送','到着'];
+  // Excel等で開いた際の表示崩れを防ぐため、セル内の改行を半角スペースにエスケープ処理します
   const rows = orders.map(o => [
     o.date||'', o.count||'', o.buyer||'', o.item||'',
-    o.price||0, o.qty||1, (o.price||0)*(o.qty||1), o.note||'',
+    o.price||0, o.qty||1, (o.price||0)*(o.qty||1),
+    (o.note||'').replace(/[\r\n]+/g, ' '),
     o.paid?'○':'', o.packed?'○':'', o.sent?'✓':'', o.arrived?'✓':''
   ]);
-  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const bom = '\uFEFF';
   const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
@@ -1201,7 +1212,6 @@ async function backupData() {
     const [imageThumb, imageFull] = await Promise.all([blobToBase64(thumbBlob), blobToBase64(fullBlob)]);
     return { ...o, imageThumb, imageFull };
   }));
-  // 画像を含むため容量は大きくなりますが、他端末へ画像ごと復元できるようにするための仕様です
   const json = JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), orders: ordersWithImages }, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1235,13 +1245,11 @@ function onRestoreFile(e) {
         const order = { ...o };
         try {
           if (o.imageThumb && o.imageFull) {
-            // 新形式：サムネイル/拡大用の2枚をそのまま復元
             const [thumbBlob, fullBlob] = await Promise.all([base64ToBlob(o.imageThumb), base64ToBlob(o.imageFull)]);
             await idbSet(order.id + '_thumb', thumbBlob);
             await idbSet(order.id + '_full', fullBlob);
             order.hasImage = true;
           } else if (o.image) {
-            // 旧形式：base64を1枚だけ持つバックアップからの復元
             const blob = await base64ToBlob(o.image);
             const img = await blobToImage(blob);
             const { thumb, full } = await makeThumbAndFull(img);
@@ -1260,7 +1268,6 @@ function onRestoreFile(e) {
       openMonths = {};
       
       recalculateAllCounts();
-      
       save(); closeSettings(); render();
       alert('復元が完了しました。');
     } catch(err) {
@@ -1283,7 +1290,7 @@ async function deleteAllData() {
 
 /* ===== INIT ===== */
 async function init() {
-  await load(); // 旧形式の画像があればここでIndexedDBへ自動移行される
+  await load();
   if (orders.length === 0) {
     orders = [
       {id:uid(),date:'2026-05-01',count:'',buyer:'山田',item:'アクセサリー',price:5000,qty:1,note:'予約',paid:true,packed:false,sent:false,arrived:false},
