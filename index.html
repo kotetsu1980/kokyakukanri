@@ -265,10 +265,27 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .amount { font-weight: 600; }
 
 /* ===== CUSTOMER LIST ===== */
-.customer-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-.customer-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; cursor: pointer; }
-.customer-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.customer-card { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px; padding: 0; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); overflow: hidden; }
+.customer-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; padding: 14px 16px; user-select: none; }
+.customer-card-head:active { background: var(--bg); }
+.customer-card-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
+.customer-name-col { min-width: 0; }
+.customer-name { font-size: 15px; font-weight: 700; color: var(--text); display: block; }
 .customer-name:active { opacity: 0.7; }
+.customer-card-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.customer-order-count { font-size: 11px; color: var(--text-muted); }
+.customer-last-date { font-size: 11px; color: var(--text-muted); }
+.customer-badge { font-size: 10px; font-weight: 700; border-radius: 20px; padding: 2px 8px; white-space: nowrap; }
+.customer-badge.unpaid { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
+.customer-card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.customer-total { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.customer-chevron { width: 16px; height: 16px; color: var(--text-muted); transition: transform 0.2s; flex-shrink: 0; }
+.customer-card.open .customer-chevron { transform: rotate(180deg); }
+.customer-card-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
+.customer-card.open .customer-card-body { display: block; padding-top: 12px; }
+.customer-jump-btn { background: none; border: 1px solid var(--border); border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: var(--text-sub); cursor: pointer; flex-shrink: 0; }
+.customer-jump-btn:active { background: var(--bg); }
+.customer-jump-btn svg { width: 14px; height: 14px; }
 .customer-furigana { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 11px; font-family: inherit; background: var(--bg); color: var(--text-sub); outline: none; }
 .customer-furigana:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 .customer-stats { display: flex; gap: 14px; margin-top: 8px; }
@@ -1122,13 +1139,17 @@ function computeCustomerStats() {
     const total = list.reduce((s,o) => s + (o.price||0)*(o.qty||1), 0);
     const oldestNote2 = (list.find(o => (o.note2||'').trim()) || {}).note2 || '';
     const rawNames = [...new Set(list.map(o => (o.buyer||'').trim()).filter(Boolean))];
+    const hasUnpaid = list.some(o => !o.paid);
+    const lastDate = latest ? (latest.date || '') : '';
     return {
       name,
       latestCount: latest ? (latest.count || 1) : '',
       total,
       oldestNote2,
       rawNames,
-      orderCount: list.length
+      orderCount: list.length,
+      hasUnpaid,
+      lastDate
     };
   });
 
@@ -1215,28 +1236,50 @@ function renderCustomerList() {
       `<span class="alias-chip">${esc(r)}<button type="button" class="unmerge-btn" data-raw="${esc(r)}" title="統合解除">✕</button></span>`
     ).join('');
     const selectId = `merge_select_${idx}`;
+    const cardId = `customer_card_${idx}`;
 
-    return `<div class="customer-card">
-      <div class="customer-card-head">
-        <span class="customer-name" data-action="filter" data-name="${esc(c.name)}">${esc(c.name)}</span>
-        <span style="font-size:11px;color:var(--text-muted)">${c.orderCount}件</span>
+    const badges = [
+      c.hasUnpaid ? `<span class="customer-badge unpaid">未払いあり</span>` : ''
+    ].join('');
+
+    return `<div class="customer-card" id="${cardId}">
+      <div class="customer-card-head" data-action="toggle" data-card="${cardId}">
+        <div class="customer-card-left">
+          <div class="customer-name-col">
+            <span class="customer-name">${esc(c.name)}</span>
+            <div class="customer-card-meta">
+              <span class="customer-order-count">${c.orderCount}件</span>
+              ${c.lastDate ? `<span class="customer-last-date">最終 ${esc(c.lastDate)}</span>` : ''}
+              ${badges}
+            </div>
+          </div>
+        </div>
+        <div class="customer-card-right">
+          <span class="customer-total">¥${fmt(c.total)}</span>
+          <button type="button" class="customer-jump-btn" data-action="filter" data-name="${esc(c.name)}" title="この顧客の注文を表示">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </button>
+          <svg class="customer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
       </div>
-      <input type="text" class="customer-furigana" data-name="${esc(c.name)}" placeholder="フリガナ（例：ヤマダ）" value="${esc(customerFurigana[c.name] || '')}" style="margin-top:8px;">
-      <div class="customer-stats">
-        <div class="customer-stat"><span class="customer-stat-num">${c.latestCount||1}</span><span class="customer-stat-label">回数(最新)</span></div>
-        <div class="customer-stat"><span class="customer-stat-num">¥${fmt(c.total)}</span><span class="customer-stat-label">トータル金額</span></div>
+      <div class="customer-card-body">
+        <input type="text" class="customer-furigana" data-name="${esc(c.name)}" placeholder="フリガナ（例：ヤマダ）" value="${esc(customerFurigana[c.name] || '')}">
+        <div class="customer-stats">
+          <div class="customer-stat"><span class="customer-stat-num">${c.latestCount||1}</span><span class="customer-stat-label">回数(最新)</span></div>
+          <div class="customer-stat"><span class="customer-stat-num">¥${fmt(c.total)}</span><span class="customer-stat-label">トータル金額</span></div>
+        </div>
+        ${c.oldestNote2 ? `<div class="customer-note2"><strong>メモ：</strong>${esc(c.oldestNote2).replace(/\n/g,'<br>')}</div>` : ''}
+        ${aliasChips ? `<div class="customer-alias-row">${aliasChips}</div>` : ''}
+        <div class="customer-memo-label">メモ（住所など）</div>
+        <textarea class="customer-memo" data-name="${esc(c.name)}" placeholder="住所やその他メモを自由に記入">${esc(customerMemos[c.name] || '')}</textarea>
+        ${otherRaw.length ? `<div class="merge-select-row">
+          <select id="${selectId}">
+            <option value="">表記ゆれを統合する相手を選択…</option>
+            ${optionsHtml}
+          </select>
+          <button type="button" class="merge-btn" data-action="merge" data-target="${selectId}" data-name="${esc(c.name)}">統合</button>
+        </div>` : ''}
       </div>
-      ${c.oldestNote2 ? `<div class="customer-note2"><strong>メモ：</strong>${esc(c.oldestNote2).replace(/\n/g,'<br>')}</div>` : ''}
-      ${aliasChips ? `<div class="customer-alias-row">${aliasChips}</div>` : ''}
-      <div class="customer-memo-label">メモ（住所など）</div>
-      <textarea class="customer-memo" data-name="${esc(c.name)}" placeholder="住所やその他メモを自由に記入">${esc(customerMemos[c.name] || '')}</textarea>
-      ${otherRaw.length ? `<div class="merge-select-row">
-        <select id="${selectId}">
-          <option value="">表記ゆれを統合する相手を選択…</option>
-          ${optionsHtml}
-        </select>
-        <button type="button" class="merge-btn" data-action="merge" data-target="${selectId}" data-name="${esc(c.name)}">統合</button>
-      </div>` : ''}
     </div>`;
   }).join('');
 }
@@ -1245,6 +1288,13 @@ function renderCustomerList() {
 document.getElementById('customerListBody').addEventListener('click', (e) => {
   const filterEl = e.target.closest('[data-action="filter"]');
   if (filterEl) { filterByCustomer(filterEl.dataset.name); return; }
+
+  const toggleEl = e.target.closest('[data-action="toggle"]');
+  if (toggleEl) {
+    const card = document.getElementById(toggleEl.dataset.card);
+    if (card) card.classList.toggle('open');
+    return;
+  }
 
   const mergeBtn = e.target.closest('[data-action="merge"]');
   if (mergeBtn) {
