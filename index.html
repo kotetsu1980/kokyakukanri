@@ -263,6 +263,31 @@ td.actions { padding: 0; min-width: 40px; }
 
 mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; }
 .amount { font-weight: 600; }
+
+/* ===== CUSTOMER LIST ===== */
+.customer-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.customer-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; cursor: pointer; }
+.customer-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.customer-name:active { opacity: 0.7; }
+.customer-furigana { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 11px; font-family: inherit; background: var(--bg); color: var(--text-sub); outline: none; }
+.customer-furigana:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+.customer-stats { display: flex; gap: 14px; margin-top: 8px; }
+.customer-stat { flex: 1; text-align: center; background: var(--bg); border-radius: 8px; padding: 8px 4px; }
+.customer-stat-num { font-size: 13px; font-weight: 700; color: var(--text); display: block; }
+.customer-stat-label { font-size: 10px; color: var(--text-sub); margin-top: 2px; display: block; }
+.customer-note2 { font-size: 11px; color: var(--text-sub); margin-top: 8px; padding: 8px 10px; background: var(--bg); border-radius: 8px; line-height: 1.4; }
+.customer-note2 strong { color: var(--text); font-weight: 600; }
+.customer-memo-label { font-size: 10px; font-weight: 600; color: var(--text-sub); margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.customer-memo { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; min-height: 44px; resize: vertical; }
+.customer-memo:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+.customer-alias-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.alias-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--accent-bg); color: var(--accent); border-radius: 20px; padding: 3px 6px 3px 10px; }
+.alias-chip button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; line-height: 1; padding: 2px; }
+.merge-select-row { display: flex; gap: 6px; margin-top: 10px; }
+.merge-select-row select { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 7px 8px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); }
+.merge-btn { background: #f1f5f9; border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 600; color: var(--text-sub); cursor: pointer; white-space: nowrap; }
+.merge-btn:active { background: #e2e8f0; }
+.customer-empty { text-align: center; padding: 40px 20px; color: var(--text-sub); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -288,6 +313,9 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <button class="add-btn" onclick="openModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         新規登録
+      </button>
+      <button class="gear-btn" onclick="openCustomerList()" aria-label="顧客一覧">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </button>
       <button class="gear-btn" onclick="openSettings()" aria-label="設定">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -338,7 +366,8 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <div class="form-row-2">
         <div class="form-row" style="margin:0">
           <label>購入者</label>
-          <input type="text" id="f-buyer" placeholder="山田" oninput="suggestCount(this.value)">
+          <input type="text" id="f-buyer" list="buyerList" placeholder="山田" oninput="suggestCount(this.value)">
+          <datalist id="buyerList"></datalist>
         </div>
         <div class="form-row" style="margin:0"><label>回数 (自動算出)</label><input type="number" id="f-count" placeholder="" min="1"></div>
       </div>
@@ -365,6 +394,10 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <div class="form-row" style="margin-top:14px">
         <label>備考 (任意)</label>
         <textarea class="auto-textarea" id="f-note" placeholder="予約、100個/1ロットなど" oninput="autoResize(this)"></textarea>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>メモ (任意)</label>
+        <textarea class="auto-textarea" id="f-note2" placeholder="配送先メモなど" oninput="autoResize(this)"></textarea>
       </div>
     </div>
     <div class="modal-footer" id="modalFooter">
@@ -417,21 +450,96 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     </div>
   </div>
 </div>
+<!-- 顧客一覧画面（全画面） -->
+<div class="overlay" id="customerOverlay" style="align-items:stretch; justify-content:stretch; z-index:300;">
+  <div class="modal" style="max-width:none !important; width:100%; height:100%; max-height:100%; border-radius:0 !important; margin:0;">
+    <div class="modal-header">
+      <span class="modal-title">顧客一覧</span>
+      <button class="close-btn" onclick="closeCustomerList()">✕</button>
+    </div>
+    <div class="toolbar" style="flex-wrap:wrap;">
+      <div class="search-wrap" style="flex:1 1 0; min-width:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" id="customerSearchInput" type="search" placeholder="顧客名・メモで検索" oninput="onCustomerSearch(this.value)">
+        <button class="search-clear" id="customerSearchClear" onclick="clearCustomerSearch()">✕</button>
+      </div>
+      <select id="customerSortKeySelect" class="search-input" style="flex:1 1 0; min-width:0; padding:9px 10px;" onchange="onCustomerSortKeyChange(this.value)">
+        <option value="total">合計金額順</option>
+        <option value="name">五十音順</option>
+        <option value="count">回数順</option>
+      </select>
+      <button class="sort-btn" id="customerSortDirBtn" onclick="toggleCustomerSortDir()" style="flex:0 0 auto; padding:9px 10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+        <span id="customerSortDirLabel">降順</span>
+      </button>
+    </div>
+    <div class="modal-body" id="customerListBody" style="padding:12px 16px;"></div>
+  </div>
+</div>
+<!-- アプリ内蔵の確認ダイアログ（環境依存のネイティブconfirm()を使わないため）-->
+<div class="overlay" id="confirmOverlay" style="z-index:400; justify-content:center; align-items:center;">
+  <div class="modal" style="max-width:320px !important; border-radius:16px !important;">
+    <div class="modal-body" style="padding:24px 20px 16px; text-align:center;">
+      <p id="confirmMessage" style="font-size:14px; color:var(--text); line-height:1.6;"></p>
+    </div>
+    <div class="modal-footer" style="padding:0 20px 20px;">
+      <div class="footer-row-split">
+        <button class="btn-cancel" id="confirmCancelBtn">キャンセル</button>
+        <button class="btn-delete" id="confirmOkBtn" style="background:var(--accent); color:#fff;">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
 <input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="onRestoreFile(event)">
 
 <script>
 const STORAGE_KEY = 'order_manager_v1';
+const ALIAS_KEY = 'order_manager_aliases_v1';
+const MEMO_KEY = 'order_manager_customer_memos_v1';
+const FURIGANA_KEY = 'order_manager_customer_furigana_v1';
 let orders = [];
 let editId = null;
 let searchQuery = '';
 let openMonths = {};
 let sortAsc = false;
 
+// ===== 顧客名寄せ・顧客メモ =====
+let customerAliases = {}; // { 生の購入者名: 正規化した顧客名 }
+let customerMemos = {};   // { 正規化した顧客名: 自由記述メモ }
+let customerFurigana = {}; // { 正規化した顧客名: フリガナ }
+
+function canonicalBuyer(raw) {
+  const b = (raw || '').trim();
+  if (!b) return '';
+  return customerAliases[b] || b;
+}
+function saveAliases() { localStorage.setItem(ALIAS_KEY, JSON.stringify(customerAliases)); }
+function saveMemos() { localStorage.setItem(MEMO_KEY, JSON.stringify(customerMemos)); }
+function saveFurigana() { localStorage.setItem(FURIGANA_KEY, JSON.stringify(customerFurigana)); }
+
 // ===== 画像の一時保管用（保存確定前のステージング）=====
 let tempImageBlobs = null;
 let imageRemoved = false;
 const thumbUrlCache = new Map();
 const fullUrlCache = new Map();
+
+/* ===== 確認ダイアログ（環境依存のネイティブconfirm()を使わない自前実装）===== */
+let confirmCallback = null;
+function showConfirm(message, onConfirm) {
+  document.getElementById('confirmMessage').textContent = message;
+  confirmCallback = onConfirm;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+document.getElementById('confirmOkBtn').addEventListener('click', () => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  const cb = confirmCallback;
+  confirmCallback = null;
+  if (cb) cb();
+});
+document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  confirmCallback = null;
+});
 
 /* ===== SPLASH ===== */
 function hideSplash() {
@@ -444,6 +552,9 @@ function hideSplash() {
 /* ===== STORAGE ===== */
 async function load() {
   try { orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { orders = []; }
+  try { customerAliases = JSON.parse(localStorage.getItem(ALIAS_KEY) || '{}'); } catch(e) { customerAliases = {}; }
+  try { customerMemos = JSON.parse(localStorage.getItem(MEMO_KEY) || '{}'); } catch(e) { customerMemos = {}; }
+  try { customerFurigana = JSON.parse(localStorage.getItem(FURIGANA_KEY) || '{}'); } catch(e) { customerFurigana = {}; }
   await migrateLegacyImages();
 }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
@@ -609,7 +720,7 @@ function showToast(msg) {
 function recalculateAllCounts() {
   const groups = {};
   orders.forEach(o => {
-    const b = (o.buyer || '').trim();
+    const b = canonicalBuyer(o.buyer);
     if (!b) return;
     if (!groups[b]) groups[b] = [];
     groups[b].push(o);
@@ -647,7 +758,7 @@ function recalculateAllCounts() {
 
 function suggestCount(name) {
   if (editId) return; 
-  const val = name.trim();
+  const val = canonicalBuyer(name);
   const date = document.getElementById('f-date').value;
   const countInput = document.getElementById('f-count');
   
@@ -658,13 +769,13 @@ function suggestCount(name) {
   
   const existingDates = [...new Set(
     orders
-      .filter(o => (o.buyer || '').trim() === val)
+      .filter(o => canonicalBuyer(o.buyer) === val)
       .map(o => o.date)
       .filter(Boolean)
   )];
   
   if (existingDates.includes(date)) {
-    const sameDayOrder = orders.find(o => (o.buyer || '').trim() === val && o.date === date);
+    const sameDayOrder = orders.find(o => canonicalBuyer(o.buyer) === val && o.date === date);
     countInput.value = sameDayOrder ? sameDayOrder.count : '';
     return;
   }
@@ -698,7 +809,7 @@ async function onImageSelected(e) {
     document.getElementById('btn-del-img').style.display = 'inline-block';
   } catch(err) {
     console.error(err);
-    alert('画像の読み込みに失敗しました');
+    showToast('画像の読み込みに失敗しました');
   }
 }
 
@@ -747,11 +858,13 @@ function matchSearch(o, q) {
   const ql = q.toLowerCase();
   const amt = String((o.price||0)*(o.qty||1));
   return (o.buyer||'').toLowerCase().includes(ql) ||
+    canonicalBuyer(o.buyer).toLowerCase().includes(ql) ||
     (o.item||'').toLowerCase().includes(ql) ||
     (o.date||'').includes(ql) ||
     fmtDate(o.date).includes(ql) ||
     amt.includes(ql) ||
-    (o.note||'').toLowerCase().includes(ql);
+    (o.note||'').toLowerCase().includes(ql) ||
+    (o.note2||'').toLowerCase().includes(ql);
 }
 function getFiltered() { return orders.filter(o => matchSearch(o, searchQuery)); }
 function getSorted(list) {
@@ -880,7 +993,7 @@ function renderTable(list, q) {
   let html = `<table><thead><tr>
     <th>日付</th><th>回数</th><th>購入者</th><th>品名</th>
     <th>単価</th><th>数量</th><th>金額</th><th>備考</th>
-    <th>入金</th><th>梱包</th><th>発送</th><th>到着</th><th></th>
+    <th>入金</th><th>梱包</th><th>発送</th><th>到着</th><th>メモ</th><th></th>
   </tr></thead><tbody>`;
   let prevDate = null;
   list.forEach(o => {
@@ -889,6 +1002,7 @@ function renderTable(list, q) {
     const amt = (o.price||0)*(o.qty||1);
     const isHit = q && matchSearch(o, q);
     const noteDisplay = o.note ? o.note.replace(/\n/g, '<br>') : '';
+    const note2Display = o.note2 ? o.note2.replace(/\n/g, '<br>') : '';
     
     const isCompleted = !isIncomplete(o);
     const kanryoBadge = isCompleted ? `<span class="kanryo-badge">完了</span>` : '';
@@ -917,6 +1031,7 @@ function renderTable(list, q) {
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="packed" onclick="toggleStatus('${o.id}','packed')">${markEl(o.packed,'on')}</td>
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="sent" onclick="toggleStatus('${o.id}','sent')">${markEl(o.sent,'check')}</td>
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="arrived" onclick="toggleStatus('${o.id}','arrived')">${markEl(o.arrived,'check')}</td>
+      <td class="note-cell">${q ? hl(note2Display, q) : note2Display}</td>
       <td class="actions"><button class="row-action-btn" onclick="openEdit('${o.id}')">…</button></td>
     </tr>`;
   });
@@ -975,6 +1090,219 @@ function render() {
   });
   content.innerHTML = html;
   hydrateThumbnails();
+  updateBuyerDatalist();
+}
+
+/* ===== 購入者オートコンプリート ===== */
+function updateBuyerDatalist() {
+  const dl = document.getElementById('buyerList');
+  if (!dl) return;
+  const names = new Set();
+  orders.forEach(o => { const b = canonicalBuyer(o.buyer); if (b) names.add(b); });
+  dl.innerHTML = [...names].sort((a,b)=>a.localeCompare(b,'ja')).map(n => `<option value="${n.replace(/"/g,'&quot;')}"></option>`).join('');
+}
+
+/* ===== 顧客一覧 ===== */
+let customerSearchQuery = '';
+let customerSortKey = 'total'; // 'total' | 'name' | 'count'
+let customerSortAsc = false;
+
+function computeCustomerStats() {
+  const groups = {};
+  orders.forEach(o => {
+    const name = canonicalBuyer(o.buyer);
+    if (!name) return;
+    if (!groups[name]) groups[name] = [];
+    groups[name].push(o);
+  });
+
+  const list = Object.keys(groups).map(name => {
+    const list = groups[name].slice().sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const latest = list[list.length - 1];
+    const total = list.reduce((s,o) => s + (o.price||0)*(o.qty||1), 0);
+    const oldestNote2 = (list.find(o => (o.note2||'').trim()) || {}).note2 || '';
+    const rawNames = [...new Set(list.map(o => (o.buyer||'').trim()).filter(Boolean))];
+    return {
+      name,
+      latestCount: latest ? (latest.count || 1) : '',
+      total,
+      oldestNote2,
+      rawNames,
+      orderCount: list.length
+    };
+  });
+
+  return list;
+}
+
+function getFilteredSortedCustomers() {
+  let list = computeCustomerStats();
+
+  const q = customerSearchQuery.trim().toLowerCase();
+  if (q) {
+    list = list.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      (customerMemos[c.name] || '').toLowerCase().includes(q) ||
+      (c.oldestNote2 || '').toLowerCase().includes(q)
+    );
+  }
+
+  const dir = customerSortAsc ? 1 : -1;
+  list.sort((a, b) => {
+    let cmp;
+    if (customerSortKey === 'name') {
+      const aKey = customerFurigana[a.name] || a.name;
+      const bKey = customerFurigana[b.name] || b.name;
+      cmp = aKey.localeCompare(bKey, 'ja');
+    } else if (customerSortKey === 'count') {
+      cmp = (Number(a.latestCount)||0) - (Number(b.latestCount)||0);
+    } else {
+      cmp = a.total - b.total;
+    }
+    return cmp * dir;
+  });
+
+  return list;
+}
+
+function onCustomerSearch(val) {
+  customerSearchQuery = val;
+  document.getElementById('customerSearchClear').classList.toggle('visible', val.trim().length > 0);
+  renderCustomerList();
+}
+function clearCustomerSearch() {
+  customerSearchQuery = '';
+  document.getElementById('customerSearchInput').value = '';
+  document.getElementById('customerSearchClear').classList.remove('visible');
+  renderCustomerList();
+}
+function toggleCustomerSortDir() {
+  customerSortAsc = !customerSortAsc;
+  document.getElementById('customerSortDirLabel').textContent = customerSortAsc ? '昇順' : '降順';
+  document.getElementById('customerSortDirBtn').classList.toggle('asc', customerSortAsc);
+  renderCustomerList();
+}
+function onCustomerSortKeyChange(val) {
+  customerSortKey = val;
+  renderCustomerList();
+}
+
+function openCustomerList() {
+  renderCustomerList();
+  document.getElementById('customerOverlay').classList.add('open');
+}
+function closeCustomerList() {
+  document.getElementById('customerOverlay').classList.remove('open');
+}
+
+function renderCustomerList() {
+  const body = document.getElementById('customerListBody');
+  const stats = getFilteredSortedCustomers();
+
+  if (stats.length === 0) {
+    body.innerHTML = `<div class="customer-empty">${customerSearchQuery.trim() ? '該当する顧客が見つかりません' : 'まだ顧客データがありません'}</div>`;
+    return;
+  }
+
+  // 統合候補用：全ての生の購入者名（正規化前）
+  const allRaw = [...new Set(orders.map(o => (o.buyer||'').trim()).filter(Boolean))];
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  body.innerHTML = stats.map((c, idx) => {
+    const otherRaw = allRaw.filter(r => canonicalBuyer(r) !== c.name);
+    const optionsHtml = otherRaw.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    const aliasChips = c.rawNames.filter(r => r !== c.name).map(r =>
+      `<span class="alias-chip">${esc(r)}<button type="button" class="unmerge-btn" data-raw="${esc(r)}" title="統合解除">✕</button></span>`
+    ).join('');
+    const selectId = `merge_select_${idx}`;
+
+    return `<div class="customer-card">
+      <div class="customer-card-head">
+        <span class="customer-name" data-action="filter" data-name="${esc(c.name)}">${esc(c.name)}</span>
+        <span style="font-size:11px;color:var(--text-muted)">${c.orderCount}件</span>
+      </div>
+      <input type="text" class="customer-furigana" data-name="${esc(c.name)}" placeholder="フリガナ（例：ヤマダ）" value="${esc(customerFurigana[c.name] || '')}" style="margin-top:8px;">
+      <div class="customer-stats">
+        <div class="customer-stat"><span class="customer-stat-num">${c.latestCount||1}</span><span class="customer-stat-label">回数(最新)</span></div>
+        <div class="customer-stat"><span class="customer-stat-num">¥${fmt(c.total)}</span><span class="customer-stat-label">トータル金額</span></div>
+      </div>
+      ${c.oldestNote2 ? `<div class="customer-note2"><strong>メモ：</strong>${esc(c.oldestNote2).replace(/\n/g,'<br>')}</div>` : ''}
+      ${aliasChips ? `<div class="customer-alias-row">${aliasChips}</div>` : ''}
+      <div class="customer-memo-label">メモ（住所など）</div>
+      <textarea class="customer-memo" data-name="${esc(c.name)}" placeholder="住所やその他メモを自由に記入">${esc(customerMemos[c.name] || '')}</textarea>
+      ${otherRaw.length ? `<div class="merge-select-row">
+        <select id="${selectId}">
+          <option value="">表記ゆれを統合する相手を選択…</option>
+          ${optionsHtml}
+        </select>
+        <button type="button" class="merge-btn" data-action="merge" data-target="${selectId}" data-name="${esc(c.name)}">統合</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ===== 顧客一覧画面のクリック／変更をまとめて処理（動的生成した要素に確実にイベントを紐付けるため委任方式にしています）=====
+document.getElementById('customerListBody').addEventListener('click', (e) => {
+  const filterEl = e.target.closest('[data-action="filter"]');
+  if (filterEl) { filterByCustomer(filterEl.dataset.name); return; }
+
+  const mergeBtn = e.target.closest('[data-action="merge"]');
+  if (mergeBtn) {
+    const select = document.getElementById(mergeBtn.dataset.target);
+    mergeCustomer(select ? select.value : '', mergeBtn.dataset.name);
+    return;
+  }
+
+  const unmergeBtn = e.target.closest('.unmerge-btn');
+  if (unmergeBtn) { unmergeCustomer(unmergeBtn.dataset.raw); return; }
+});
+document.getElementById('customerListBody').addEventListener('change', (e) => {
+  const memoEl = e.target.closest('.customer-memo');
+  if (memoEl) { saveCustomerMemo(memoEl.dataset.name, memoEl.value); return; }
+  const furiganaEl = e.target.closest('.customer-furigana');
+  if (furiganaEl) { saveCustomerFurigana(furiganaEl.dataset.name, furiganaEl.value); }
+});
+
+function saveCustomerMemo(name, value) {
+  customerMemos[name] = value.trim();
+  saveMemos();
+}
+
+function saveCustomerFurigana(name, value) {
+  customerFurigana[name] = value.trim();
+  saveFurigana();
+}
+
+function mergeCustomer(rawName, canonicalName) {
+  if (!rawName) { showToast('統合する表記を選択してください'); return; }
+  customerAliases[rawName] = canonicalName;
+  saveAliases();
+  recalculateAllCounts();
+  save();
+  renderCustomerList();
+  render();
+  showToast(`「${rawName}」を「${canonicalName}」に統合しました`);
+}
+
+function unmergeCustomer(rawName) {
+  if (!rawName) return;
+  showConfirm(`「${rawName}」の統合を解除しますか？`, () => {
+    delete customerAliases[rawName];
+    saveAliases();
+    recalculateAllCounts();
+    save();
+    renderCustomerList();
+    render();
+    showToast(`「${rawName}」の統合を解除しました`);
+  });
+}
+
+function filterByCustomer(name) {
+  closeCustomerList();
+  searchQuery = name;
+  document.getElementById('searchInput').value = name;
+  document.getElementById('searchClear').classList.add('visible');
+  render();
 }
 
 async function hydrateThumbnails() {
@@ -1019,6 +1347,9 @@ function openModal(id) {
     const ta = document.getElementById('f-note');
     ta.value = o.note||'';
     setTimeout(() => autoResize(ta), 0);
+    const ta2 = document.getElementById('f-note2');
+    ta2.value = o.note2||'';
+    setTimeout(() => autoResize(ta2), 0);
     
     if (o.hasImage) {
       imageRemoved = false;
@@ -1053,6 +1384,9 @@ function openModal(id) {
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
+    const ta2 = document.getElementById('f-note2');
+    ta2.value = '';
+    ta2.style.height = '80px';
     
     footer.innerHTML = `
       <div class="footer-grid-new">
@@ -1066,6 +1400,7 @@ function openModal(id) {
         </div>
       </div>`;
   }
+  updateBuyerDatalist();
   document.getElementById('overlay').classList.add('open');
   setTimeout(() => document.getElementById('f-buyer').focus(), 100);
 }
@@ -1080,7 +1415,7 @@ async function saveOrder(mode = 'close') {
   const item = document.getElementById('f-item').value.trim();
   const count = document.getElementById('f-count').value || '';
   
-  if (!date || !buyer || !item) { alert('日付・購入者・品名は必須です'); return; }
+  if (!date || !buyer || !item) { showToast('日付・購入者・品名は必須です'); return; }
   
   const data = {
     date, buyer,
@@ -1088,7 +1423,8 @@ async function saveOrder(mode = 'close') {
     item,
     price: parseInt(document.getElementById('f-price').value)||0,
     qty: parseInt(document.getElementById('f-qty').value)||1,
-    note: document.getElementById('f-note').value.trim()
+    note: document.getElementById('f-note').value.trim(),
+    note2: document.getElementById('f-note2').value.trim()
   };
   
   let orderId;
@@ -1113,7 +1449,7 @@ async function saveOrder(mode = 'close') {
       fullUrlCache.delete(orderId);
     } catch(err) {
       console.error(err);
-      alert('画像の保存に失敗しました');
+      showToast('画像の保存に失敗しました');
     }
   } else if (imageRemoved && order.hasImage) {
     await idbDelete(orderId + '_thumb').catch(()=>{});
@@ -1134,6 +1470,9 @@ async function saveOrder(mode = 'close') {
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
+    const ta2 = document.getElementById('f-note2');
+    ta2.value = '';
+    ta2.style.height = '80px';
     
     removeSelectedImage();
     suggestCount(buyer);
@@ -1150,6 +1489,9 @@ async function saveOrder(mode = 'close') {
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
+    const ta2 = document.getElementById('f-note2');
+    ta2.value = '';
+    ta2.style.height = '80px';
     
     removeSelectedImage();
     
@@ -1161,20 +1503,21 @@ async function saveOrder(mode = 'close') {
   }
 }
 
-async function deleteOrder() {
-  if (!confirm('この受注を削除しますか？')) return;
-  const target = orders.find(o => o.id === editId);
-  orders = orders.filter(o => o.id !== editId);
+function deleteOrder() {
+  showConfirm('この受注を削除しますか？', async () => {
+    const target = orders.find(o => o.id === editId);
+    orders = orders.filter(o => o.id !== editId);
 
-  if (target && target.hasImage) {
-    await idbDelete(editId + '_thumb').catch(()=>{});
-    await idbDelete(editId + '_full').catch(()=>{});
-    thumbUrlCache.delete(editId);
-    fullUrlCache.delete(editId);
-  }
-  
-  recalculateAllCounts();
-  save(); closeModal(); render();
+    if (target && target.hasImage) {
+      await idbDelete(editId + '_thumb').catch(()=>{});
+      await idbDelete(editId + '_full').catch(()=>{});
+      thumbUrlCache.delete(editId);
+      fullUrlCache.delete(editId);
+    }
+
+    recalculateAllCounts();
+    save(); closeModal(); render();
+  });
 }
 
 /* ===== SETTINGS ===== */
@@ -1183,13 +1526,14 @@ function closeSettings() { document.getElementById('settingsOverlay').classList.
 function onSettingsOverlayClick(e) { if (e.target === document.getElementById('settingsOverlay')) closeSettings(); }
 
 function exportCSV() {
-  const header = ['日付','回数','購入者','品名','単価','数量','金額','備考','入金','梱包','発送','到着'];
+  const header = ['日付','回数','購入者','品名','単価','数量','金額','備考','入金','梱包','発送','到着','メモ'];
   // Excel等で開いた際の表示崩れを防ぐため、セル内の改行を半角スペースにエスケープ処理します
   const rows = orders.map(o => [
     o.date||'', o.count||'', o.buyer||'', o.item||'',
     o.price||0, o.qty||1, (o.price||0)*(o.qty||1),
     (o.note||'').replace(/[\r\n]+/g, ' '),
-    o.paid?'○':'', o.packed?'○':'', o.sent?'✓':'', o.arrived?'✓':''
+    o.paid?'○':'', o.packed?'○':'', o.sent?'✓':'', o.arrived?'✓':'',
+    (o.note2||'').replace(/[\r\n]+/g, ' ')
   ]);
   const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const bom = '\uFEFF';
@@ -1212,7 +1556,7 @@ async function backupData() {
     const [imageThumb, imageFull] = await Promise.all([blobToBase64(thumbBlob), blobToBase64(fullBlob)]);
     return { ...o, imageThumb, imageFull };
   }));
-  const json = JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), orders: ordersWithImages }, null, 2);
+  const json = JSON.stringify({ version: 4, exportedAt: new Date().toISOString(), orders: ordersWithImages, customerAliases, customerMemos, customerFurigana }, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1228,64 +1572,78 @@ function onRestoreFile(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = async ev => {
+  reader.onload = ev => {
+    let data, restored;
     try {
-      const data = JSON.parse(ev.target.result);
-      const restored = data.orders || data;
+      data = JSON.parse(ev.target.result);
+      restored = data.orders || data;
       if (!Array.isArray(restored)) throw new Error('invalid');
-      if (!confirm(`${restored.length}件のデータを復元します。現在のデータは上書きされます。`)) return;
-
-      showToast('復元中…');
-      await idbClearAll().catch(()=>{});
-      thumbUrlCache.clear();
-      fullUrlCache.clear();
-
-      const newOrders = [];
-      for (const o of restored) {
-        const order = { ...o };
-        try {
-          if (o.imageThumb && o.imageFull) {
-            const [thumbBlob, fullBlob] = await Promise.all([base64ToBlob(o.imageThumb), base64ToBlob(o.imageFull)]);
-            await idbSet(order.id + '_thumb', thumbBlob);
-            await idbSet(order.id + '_full', fullBlob);
-            order.hasImage = true;
-          } else if (o.image) {
-            const blob = await base64ToBlob(o.image);
-            const img = await blobToImage(blob);
-            const { thumb, full } = await makeThumbAndFull(img);
-            await idbSet(order.id + '_thumb', thumb);
-            await idbSet(order.id + '_full', full);
-            order.hasImage = true;
-          }
-        } catch(imgErr) {
-          console.error('画像の復元に失敗しました:', order.id, imgErr);
-        }
-        delete order.image; delete order.imageThumb; delete order.imageFull;
-        newOrders.push(order);
-      }
-
-      orders = newOrders;
-      openMonths = {};
-      
-      recalculateAllCounts();
-      save(); closeSettings(); render();
-      alert('復元が完了しました。');
     } catch(err) {
       console.error(err);
-      alert('ファイルの読み込みに失敗しました。正しいバックアップファイルを選択してください。');
+      showToast('ファイルの読み込みに失敗しました');
+      e.target.value = '';
+      return;
     }
+
+    showConfirm(`${restored.length}件のデータを復元します。現在のデータは上書きされます。`, async () => {
+      try {
+        showToast('復元中…');
+        await idbClearAll().catch(()=>{});
+        thumbUrlCache.clear();
+        fullUrlCache.clear();
+
+        const newOrders = [];
+        for (const o of restored) {
+          const order = { ...o };
+          try {
+            if (o.imageThumb && o.imageFull) {
+              const [thumbBlob, fullBlob] = await Promise.all([base64ToBlob(o.imageThumb), base64ToBlob(o.imageFull)]);
+              await idbSet(order.id + '_thumb', thumbBlob);
+              await idbSet(order.id + '_full', fullBlob);
+              order.hasImage = true;
+            } else if (o.image) {
+              const blob = await base64ToBlob(o.image);
+              const img = await blobToImage(blob);
+              const { thumb, full } = await makeThumbAndFull(img);
+              await idbSet(order.id + '_thumb', thumb);
+              await idbSet(order.id + '_full', full);
+              order.hasImage = true;
+            }
+          } catch(imgErr) {
+            console.error('画像の復元に失敗しました:', order.id, imgErr);
+          }
+          delete order.image; delete order.imageThumb; delete order.imageFull;
+          newOrders.push(order);
+        }
+
+        orders = newOrders;
+        openMonths = {};
+        customerAliases = (data.customerAliases && typeof data.customerAliases === 'object') ? data.customerAliases : {};
+        customerMemos = (data.customerMemos && typeof data.customerMemos === 'object') ? data.customerMemos : {};
+        customerFurigana = (data.customerFurigana && typeof data.customerFurigana === 'object') ? data.customerFurigana : {};
+        saveAliases(); saveMemos(); saveFurigana();
+
+        recalculateAllCounts();
+        save(); closeSettings(); render();
+        showToast('復元が完了しました');
+      } catch(err) {
+        console.error(err);
+        showToast('ファイルの読み込みに失敗しました。正しいバックアップファイルを選択してください。');
+      }
+    });
   };
   reader.readAsText(file);
   e.target.value = '';
 }
 
-async function deleteAllData() {
-  if (!confirm('全データを削除しますか？この操作は元に戻せません。')) return;
-  orders = []; openMonths = {};
-  await idbClearAll().catch(()=>{});
-  thumbUrlCache.clear();
-  fullUrlCache.clear();
-  save(); closeSettings(); render();
+function deleteAllData() {
+  showConfirm('全データを削除しますか？この操作は元に戻せません。', async () => {
+    orders = []; openMonths = {};
+    await idbClearAll().catch(()=>{});
+    thumbUrlCache.clear();
+    fullUrlCache.clear();
+    save(); closeSettings(); render();
+  });
 }
 
 /* ===== INIT ===== */
