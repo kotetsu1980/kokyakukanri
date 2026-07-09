@@ -174,7 +174,7 @@ td.actions { padding: 0; min-width: 40px; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 10; }
 .modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
 .close-btn { background: #f1f5f9; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sub); }
-.modal-body { padding: 20px; overflow-y: auto; }
+.modal-body { padding: 20px; overflow-y: auto; overflow-x: hidden; }
 .form-row { margin-bottom: 14px; }
 .form-row label { display: block; font-size: 11px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
 .form-row input, .form-row select { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; transition: border 0.15s; }
@@ -283,17 +283,13 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .history-row-del { background: #fee2e2; border: none; border-radius: 8px; width: 30px; height: 34px; color: #dc2626; font-size: 13px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 @media (max-width: 480px) {
   .history-row {
-    grid-template-columns: 1fr 1fr auto;
-    grid-template-areas:
-      "date buyer del"
-      "media account del";
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     gap: 6px;
   }
-  .history-row .h-date { grid-area: date; }
-  .history-row .h-buyer { grid-area: buyer; }
-  .history-row .h-media { grid-area: media; }
-  .history-row .h-account { grid-area: account; }
-  .history-row-del { grid-area: del; width: 34px; height: 100%; min-height: 74px; }
+  .history-row input { min-width: 0; }
+  .history-row-del { align-self: flex-end; width: 44px; height: 34px; }
 }
 .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px; box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04); overflow: hidden; cursor: pointer; transition: box-shadow 0.15s; }
 .product-card:active { box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.08); }
@@ -679,7 +675,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <div id="shipDatePickRow" style="display:none;">
         <div class="form-row" style="margin-bottom:14px;">
           <label>発送日を選択</label>
-          <input type="date" id="ship-date-input" style="width: 100%; box-sizing: border-box; height: 38px;">
+          <input type="date" id="ship-date-input" style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; height: 38px;">
         </div>
         <div class="footer-row-split">
           <button class="btn-cancel" onclick="closeShipModal()">キャンセル</button>
