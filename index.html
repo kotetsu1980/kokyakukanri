@@ -41,10 +41,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     overflow: hidden;
     border: 1px solid var(--border);
   }
-  header {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-  }
+  header { border-top-left-radius: 15px; border-top-right-radius: 15px; }
 }
 
 /* ===== SPLASH ===== */
@@ -60,13 +57,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   color: #0f172a; text-transform: uppercase; text-align: center;
   line-height: 1.4;
 }
-.splash-line {
-  width: 32px; height: 1px; background: #0f172a;
-  margin: 24px auto;
-}
-.splash-sub {
-  font-size: 11px; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase;
-}
+.splash-line { width: 32px; height: 1px; background: #0f172a; margin: 24px auto; }
+.splash-sub { font-size: 11px; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase; }
 .splash-hint {
   position: absolute; bottom: 52px;
   font-size: 11px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase;
@@ -86,7 +78,7 @@ header h1 { font-size: 17px; font-weight: 700; color: var(--text); letter-spacin
 .gear-btn:active { background: var(--bg); }
 .gear-btn svg { width: 18px; height: 18px; }
 
-/* ===== SUMMARY (NO SCROLL, AUTO-FIT) ===== */
+/* ===== SUMMARY ===== */
 .summary { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 4px; }
 .stat { display: flex; flex-direction: column; align-items: center; flex: 1 1 0; text-align: center; }
 .stat-num { font-size: 15px; font-weight: 700; color: var(--text); }
@@ -142,7 +134,6 @@ tr:hover td { background: #f8fafc; }
 tr.group-start td { border-top: 2px solid var(--border-strong); }
 tr.highlight td { background: var(--warn-bg) !important; }
 
-/* Note cell */
 .note-cell { min-width: 130px; max-width: 220px; white-space: normal; word-break: break-all; padding: 8px 10px; text-align: left; line-height: 1.4; font-size: 11px; color: var(--text-sub); }
 
 /* Status toggles */
@@ -157,29 +148,14 @@ td.actions { padding: 0; min-width: 40px; }
 
 /* ===== KANRYO BADGE STYLE ===== */
 .kanryo-badge {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  background: var(--success-bg);
-  color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  padding: 1px 5px;
-  border-radius: 4px;
-  margin-right: 6px;
-  vertical-align: middle;
+  display: inline-block; font-size: 10px; font-weight: 700; background: var(--success-bg); color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.25); padding: 1px 5px; border-radius: 4px; margin-right: 6px; vertical-align: middle;
 }
 
 /* ===== IMAGES THUMBNAIL IN TABLE ===== */
 .table-thumb {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  object-fit: cover;
-  cursor: zoom-in;
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  flex-shrink: 0;
-  transition: opacity 0.15s;
+  width: 34px; height: 34px; border-radius: 6px; object-fit: cover; cursor: zoom-in;
+  border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0; transition: opacity 0.15s;
 }
 .table-thumb:active { opacity: 0.75; }
 
@@ -207,7 +183,6 @@ td.actions { padding: 0; min-width: 40px; }
 .auto-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ---- 品名入力：品番一覧プルダウン選択 ---- */
 .item-picker-btn { flex-shrink: 0; width: 44px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 .item-picker-btn:active { background: var(--bg); }
 .item-picker-btn svg { width: 16px; height: 16px; }
@@ -232,33 +207,22 @@ td.actions { padding: 0; min-width: 40px; }
 
 .btn-continue-diff { width: 100%; background: #f1f5f9; border: 1px solid var(--border-strong); border-radius: 10px; padding: 12px; font-size: 12px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: background 0.15s; }
 .btn-continue-diff:active { background: #e2e8f0; }
-
 .btn-delete { width: 100%; background: #fee2e2; border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 600; color: #dc2626; cursor: pointer; }
 
-/* フッターボタン用のレイアウト配置と余白設定 */
-.footer-row-primary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.footer-grid-new {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.footer-row-primary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.footer-grid-new { display: flex; flex-direction: column; gap: 12px; }
 
-/* ===== TOAST NOTIFICATION ===== */
+/* ===== TOAST ===== */
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 100px);
   background: #0f172a; color: #ffffff; padding: 10px 20px; border-radius: 30px;
   font-size: 12px; font-weight: 500; z-index: 9999; opacity: 0;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); pointer-events: none;
-  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); pointer-events: none; white-space: nowrap;
 }
 .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
-/* ===== SETTINGS MODAL ===== */
+/* ===== SETTINGS ===== */
 .settings-list { padding: 8px 0; }
 .settings-item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; }
 .settings-item:last-child { border-bottom: none; }
@@ -302,7 +266,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .customer-jump-btn svg { width: 14px; height: 14px; }
 .customer-furigana { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 11px; font-family: inherit; background: var(--bg); color: var(--text-sub); outline: none; }
 
-/* ===== PRODUCT (品番管理) ===== */
+/* ===== PRODUCT ===== */
 .code-input-row { display: flex; align-items: center; gap: 8px; }
 .code-input-row input { text-align: center; }
 .code-input-row .code-alpha { flex: 0 0 76px; text-transform: uppercase; }
@@ -346,7 +310,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .product-history-badge { font-size: 11px; color: var(--text-muted); margin-top: 6px; display: inline-flex; align-items: center; gap: 3px; }
 .product-history-badge svg { width: 12px; height: 12px; }
 
-/* ---- 品番詳細（アコーディオン・画像拡大）---- */
+/* ---- 品番詳細 ---- */
 .detail-image-wrap { width: 100%; border-radius: 12px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); cursor: zoom-in; position: relative; }
 .detail-image-wrap img { width: 100%; max-height: 260px; object-fit: cover; display: block; }
 .detail-image-placeholder { width: 100%; height: 160px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); background: var(--bg); border-radius: 12px; border: 1px solid var(--border); }
@@ -417,7 +381,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </button>
       <button class="gear-btn" onclick="openProductList()" aria-label="品番管理">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24H4a1 1 0 0 0-1 1v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.83z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24H4a1 1 0 0 0-1 1v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 .83 0l4.59-4.59a2 2 0 0 0 0-2.83z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
       </button>
       <button class="gear-btn" onclick="openSettings()" aria-label="設定">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -452,15 +416,14 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 
 </div><!-- /app -->
 
-<!-- 受注入力モーダル -->
-<div class="overlay" id="overlay" onclick="onOverlayClick(event)">
+<!-- 受注入力モーダル（誤タップで閉じないよう overlay click 削除） -->
+<div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="modalTitle">新規登録</span>
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <!-- 日付入力幅の調整（max-widthを追加） -->
       <div class="form-row" style="max-width: 200px;">
         <label>日付</label>
         <input type="date" id="f-date" onchange="suggestCount(document.getElementById('f-buyer').value)">
@@ -512,9 +475,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
         <textarea class="auto-textarea" id="f-note2" placeholder="配送先メモなど" oninput="autoResize(this)"></textarea>
       </div>
     </div>
-    <div class="modal-footer" id="modalFooter">
-      <!-- JSでボタンが動的に挿入されます -->
-    </div>
+    <div class="modal-footer" id="modalFooter"></div>
   </div>
 </div>
 
@@ -562,7 +523,8 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     </div>
   </div>
 </div>
-<!-- 顧客一覧画面（全画面） -->
+
+<!-- 顧客一覧画面 -->
 <div class="overlay" id="customerOverlay" style="align-items:stretch; justify-content:stretch; z-index:300;">
   <div class="modal" style="max-width:none !important; width:100%; height:100%; max-height:100%; border-radius:0 !important; margin:0;">
     <div class="modal-header">
@@ -589,7 +551,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
   </div>
 </div>
 
-<!-- 品番一覧（フルスクリーン） -->
+<!-- 品番一覧 -->
 <div class="overlay" id="productListOverlay" onclick="onProductListOverlayClick(event)">
   <div class="modal" style="max-width:none !important; width:100%; height:100%; max-height:100%; border-radius:0 !important; margin:0;">
     <div class="modal-header">
@@ -615,8 +577,8 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
   </div>
 </div>
 
-<!-- 品番登録モーダル -->
-<div class="overlay" id="productOverlay" onclick="onProductOverlayClick(event)">
+<!-- 品番登録モーダル（誤タップで閉じないよう overlay click 削除） -->
+<div class="overlay" id="productOverlay">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="productModalTitle">品番登録</span>
@@ -672,7 +634,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
   </div>
 </div>
 
-<!-- 品番詳細モーダル（画像拡大・アコーディオン表示） -->
+<!-- 品番詳細モーダル -->
 <div class="overlay" id="productDetailOverlay" onclick="onProductDetailOverlayClick(event)">
   <div class="modal">
     <div class="modal-header">
@@ -685,7 +647,8 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     </div>
   </div>
 </div>
-<!-- アプリ内蔵の確認ダイアログ -->
+
+<!-- アプリ内蔵確認ダイアログ -->
 <div class="overlay" id="confirmOverlay" style="z-index:400; justify-content:center; align-items:center;">
   <div class="modal" style="max-width:320px !important; border-radius:16px !important;">
     <div class="modal-body" style="padding:24px 20px 16px; text-align:center;">
@@ -701,7 +664,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 </div>
 
 <!-- 発送日記録モーダル -->
-<div class="overlay" id="shipOverlay" onclick="onShipOverlayClick(event)" style="justify-content:center; align-items:center;">
+<div class="overlay" id="shipOverlay" style="justify-content:center; align-items:center;">
   <div class="modal" style="max-width:320px !important; border-radius:16px !important;">
     <div class="modal-header">
       <span class="modal-title">発送日を記録</span>
@@ -744,25 +707,39 @@ let productSearchQuery = '';
 let openMonths = {};
 let sortAsc = false;
 
-// ===== 顧客名寄せ・顧客メモ =====
-let customerAliases = {}; // { 生の購入者名: 正規化した顧客名 }
-let customerMemos = {};   // { 正規化した顧客名: 自由記述メモ }
-let customerFurigana = {}; // { 正規化した顧客名: フリガナ }
+let customerAliases = {};
+let customerMemos = {};
+let customerFurigana = {};
 
 function canonicalBuyer(raw) {
   const b = (raw || '').trim();
-  if (!b) return '';
-  return customerAliases[b] || b;
+  return b ? (customerAliases[b] || b) : '';
 }
 function saveAliases() { localStorage.setItem(ALIAS_KEY, JSON.stringify(customerAliases)); }
 function saveMemos() { localStorage.setItem(MEMO_KEY, JSON.stringify(customerMemos)); }
 function saveFurigana() { localStorage.setItem(FURIGANA_KEY, JSON.stringify(customerFurigana)); }
 
-// ===== 画像の一時保管用 =====
 let tempImageBlobs = null;
 let imageRemoved = false;
 const thumbUrlCache = new Map();
 const fullUrlCache = new Map();
+
+// 現在ローカル日付をJSTのズレなく取得する共通関数
+function getLocalDateString() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// メモリリーク防止：ObjectURLを安全に解放
+function revokePreviewUrl(previewElement) {
+  if (previewElement && previewElement.dataset.blobUrl) {
+    URL.revokeObjectURL(previewElement.dataset.blobUrl);
+    delete previewElement.dataset.blobUrl;
+  }
+}
 
 /* ===== 確認ダイアログ ===== */
 let confirmCallback = null;
@@ -884,9 +861,7 @@ function blobToImage(blob) {
     img.src = url;
   });
 }
-function base64ToBlob(dataUrl) {
-  return fetch(dataUrl).then(r => r.blob());
-}
+function base64ToBlob(dataUrl) { return fetch(dataUrl).then(r => r.blob()); }
 function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     if (!blob) { resolve(null); return; }
@@ -916,7 +891,6 @@ async function makeThumbAndFull(img) {
   return { thumb, full };
 }
 
-/* ===== 旧バージョンからの自動移行 ===== */
 async function migrateLegacyImages() {
   let changed = false;
   for (const o of orders) {
@@ -928,9 +902,7 @@ async function migrateLegacyImages() {
         await idbSet(o.id + '_thumb', thumb);
         await idbSet(o.id + '_full', full);
         o.hasImage = true;
-      } catch(err) {
-        console.error('画像移行に失敗しました:', o.id, err);
-      }
+      } catch(err) { console.error('画像移行失敗:', o.id, err); }
       delete o.image;
       changed = true;
     }
@@ -950,14 +922,11 @@ function fmtMonth(d) {
 }
 function getMonth(d) { return d ? d.slice(0,7) : ''; }
 
-/* ===== TOAST NOTIFICATION ===== */
 function showToast(msg) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 2200);
+  setTimeout(() => { toast.classList.remove('show'); }, 2200);
 }
 
 /* ===== 時系列リナンバー ＆ 同日判定 ===== */
@@ -986,15 +955,11 @@ function recalculateAllCounts() {
     });
 
     if (dateGroups.length <= 1) {
-      buyerOrders.forEach(o => {
-        o.count = '';
-      });
+      buyerOrders.forEach(o => { o.count = ''; });
     } else {
       dateGroups.forEach((group, index) => {
         const countValue = index === 0 ? '' : (index + 1);
-        group.list.forEach(o => {
-          o.count = countValue;
-        });
+        group.list.forEach(o => { o.count = countValue; });
       });
     }
   }
@@ -1045,7 +1010,7 @@ async function onImageSelected(e) {
     imageRemoved = false;
 
     const preview = document.getElementById('modal-img-preview');
-    if (preview.dataset.blobUrl) URL.revokeObjectURL(preview.dataset.blobUrl);
+    revokePreviewUrl(preview);
     const url = URL.createObjectURL(thumb);
     preview.src = url;
     preview.dataset.blobUrl = url;
@@ -1062,7 +1027,7 @@ function removeSelectedImage() {
   imageRemoved = true;
   document.getElementById('f-image-input').value = '';
   const preview = document.getElementById('modal-img-preview');
-  if (preview.dataset.blobUrl) { URL.revokeObjectURL(preview.dataset.blobUrl); delete preview.dataset.blobUrl; }
+  revokePreviewUrl(preview);
   preview.src = '';
   preview.style.display = 'none';
   document.getElementById('btn-del-img').style.display = 'none';
@@ -1082,9 +1047,7 @@ async function openImagePreview(id, e) {
       fullUrlCache.set(id, url);
     }
     img.src = url;
-  } catch(err) {
-    console.error(err);
-  }
+  } catch(err) { console.error(err); }
 }
 
 function closeImgPreview() {
@@ -1147,7 +1110,6 @@ function toggleStatus(id, field) {
   });
 
   renderSummary();
-
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
   refreshCompletionBadge(id);
@@ -1193,9 +1155,7 @@ function updateMonthBadge(m) {
     if (badgeEl) badgeEl.remove();
   }
 }
-function isIncomplete(o) {
-  return !o.paid || !o.packed || !o.sentDate;
-}
+function isIncomplete(o) { return !o.paid || !o.packed || !o.sentDate; }
 function markEl(on, type) {
   const cls = type === 'check' ? 'check' : 'on';
   const sym = type === 'check' ? '✓' : '○';
@@ -1217,16 +1177,13 @@ function closeShipModal() {
   document.getElementById('shipOverlay').classList.remove('open');
   shipTargetId = null;
 }
-function onShipOverlayClick(e) { if (e.target === document.getElementById('shipOverlay')) closeShipModal(); }
 
-function onShipYes() {
-  setShipDate(new Date().toISOString().slice(0,10));
-}
+function onShipYes() { setShipDate(getLocalDateString()); }
 function onShipNo() {
   const o = orders.find(o => o.id === shipTargetId);
   document.getElementById('shipYesNoRow').style.display = 'none';
   const dateInput = document.getElementById('ship-date-input');
-  dateInput.value = (o && o.sentDate) || new Date().toISOString().slice(0,10);
+  dateInput.value = (o && o.sentDate) || getLocalDateString();
   document.getElementById('shipDatePickRow').style.display = 'block';
 }
 function onShipDateConfirm() {
@@ -1234,9 +1191,7 @@ function onShipDateConfirm() {
   if (!val) { showToast('日付を選択してください'); return; }
   setShipDate(val);
 }
-function onShipClear() {
-  setShipDate('');
-}
+function onShipClear() { setShipDate(''); }
 function setShipDate(dateStr) {
   const o = orders.find(o => o.id === shipTargetId);
   if (!o) { closeShipModal(); return; }
@@ -1254,7 +1209,6 @@ function setShipDate(dateStr) {
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
   refreshCompletionBadge(o.id);
-
   closeShipModal();
   showToast(o.sentDate ? '発送日を記録しました' : '未発送に戻しました');
 }
@@ -1309,10 +1263,8 @@ function renderTable(list, q) {
     const isHit = q && matchSearch(o, q);
     const noteDisplay = o.note ? o.note.replace(/\n/g, '<br>') : '';
     const note2Display = o.note2 ? o.note2.replace(/\n/g, '<br>') : '';
-    
     const isCompleted = !isIncomplete(o);
     const kanryoBadge = isCompleted ? `<span class="kanryo-badge">完了</span>` : '';
-    
     const imageHtml = o.hasImage
       ? `<img data-img-id="${o.id}" class="table-thumb" onclick="openImagePreview('${o.id}', event)" alt="商品画像">`
       : '';
@@ -1410,7 +1362,7 @@ function updateBuyerDatalist() {
 
 /* ===== 顧客一覧 ===== */
 let customerSearchQuery = '';
-let customerSortKey = 'total'; // 'total' | 'name' | 'count'
+let customerSortKey = 'total';
 let customerSortAsc = false;
 
 function computeCustomerStats() {
@@ -1422,7 +1374,7 @@ function computeCustomerStats() {
     groups[name].push(o);
   });
 
-  const list = Object.keys(groups).map(name => {
+  return Object.keys(groups).map(name => {
     const list = groups[name].slice().sort((a,b) => (a.date||'').localeCompare(b.date||''));
     const latest = list[list.length - 1];
     const total = list.reduce((s,o) => s + (o.price||0)*(o.qty||1), 0);
@@ -1441,13 +1393,10 @@ function computeCustomerStats() {
       lastDate
     };
   });
-
-  return list;
 }
 
 function getFilteredSortedCustomers() {
   let list = computeCustomerStats();
-
   const q = customerSearchQuery.trim().toLowerCase();
   if (q) {
     list = list.filter(c =>
@@ -1471,7 +1420,6 @@ function getFilteredSortedCustomers() {
     }
     return cmp * dir;
   });
-
   return list;
 }
 
@@ -1514,7 +1462,6 @@ function renderCustomerList() {
     return;
   }
 
-  // 統合候補用
   const allRaw = [...new Set(orders.map(o => (o.buyer||'').trim()).filter(Boolean))];
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -1526,10 +1473,7 @@ function renderCustomerList() {
     ).join('');
     const selectId = `merge_select_${idx}`;
     const cardId = `customer_card_${idx}`;
-
-    const badges = [
-      c.hasUnpaid ? `<span class="customer-badge unpaid">未払いあり</span>` : ''
-    ].join('');
+    const badges = [ c.hasUnpaid ? `<span class="customer-badge unpaid">未払いあり</span>` : '' ].join('');
 
     return `<div class="customer-card" id="${cardId}">
       <div class="customer-card-head" data-action="toggle" data-card="${cardId}">
@@ -1573,28 +1517,25 @@ function renderCustomerList() {
   }).join('');
 }
 
-// ===== 顧客一覧画面のクリック／変更を処理 =====
 document.getElementById('customerListBody').addEventListener('click', (e) => {
   const filterEl = e.target.closest('[data-action="filter"]');
   if (filterEl) { filterByCustomer(filterEl.dataset.name); return; }
-
   const toggleEl = e.target.closest('[data-action="toggle"]');
   if (toggleEl) {
     const card = document.getElementById(toggleEl.dataset.card);
     if (card) card.classList.toggle('open');
     return;
   }
-
   const mergeBtn = e.target.closest('[data-action="merge"]');
   if (mergeBtn) {
     const select = document.getElementById(mergeBtn.dataset.target);
     mergeCustomer(select ? select.value : '', mergeBtn.dataset.name);
     return;
   }
-
   const unmergeBtn = e.target.closest('.unmerge-btn');
-  if (unmergeBtn) { unmergeCustomer(unmergeBtn.dataset.raw); return; }
+  if (unmergeBtn) { unmergeCustomer(unmergeBtn.dataset.raw); }
 });
+
 document.getElementById('customerListBody').addEventListener('change', (e) => {
   const memoEl = e.target.closest('.customer-memo');
   if (memoEl) { saveCustomerMemo(memoEl.dataset.name, memoEl.value); return; }
@@ -1602,15 +1543,8 @@ document.getElementById('customerListBody').addEventListener('change', (e) => {
   if (furiganaEl) { saveCustomerFurigana(furiganaEl.dataset.name, furiganaEl.value); }
 });
 
-function saveCustomerMemo(name, value) {
-  customerMemos[name] = value.trim();
-  saveMemos();
-}
-
-function saveCustomerFurigana(name, value) {
-  customerFurigana[name] = value.trim();
-  saveFurigana();
-}
+function saveCustomerMemo(name, value) { customerMemos[name] = value.trim(); saveMemos(); }
+function saveCustomerFurigana(name, value) { customerFurigana[name] = value.trim(); saveFurigana(); }
 
 function mergeCustomer(rawName, canonicalName) {
   if (!rawName) { showToast('統合する表記を選択してください'); return; }
@@ -1684,19 +1618,21 @@ function openModal(id) {
     document.getElementById('f-price').value = o.price||'';
     document.getElementById('f-qty').value = o.qty||1;
     document.getElementById('f-shipping').value = o.shipping||'';
+    
     const ta = document.getElementById('f-note');
     ta.value = o.note||'';
-    setTimeout(() => autoResize(ta), 0);
     const ta2 = document.getElementById('f-note2');
     ta2.value = o.note2||'';
-    setTimeout(() => autoResize(ta2), 0);
+    
+    // 表示直後に自動リサイズを強制発火
+    setTimeout(() => { autoResize(ta); autoResize(ta2); }, 50);
     
     if (o.hasImage) {
       imageRemoved = false;
       const preview = document.getElementById('modal-img-preview');
       idbGet(o.id + '_thumb').then(blob => {
         if (!blob) return;
-        if (preview.dataset.blobUrl) URL.revokeObjectURL(preview.dataset.blobUrl);
+        revokePreviewUrl(preview);
         const url = URL.createObjectURL(blob);
         preview.src = url;
         preview.dataset.blobUrl = url;
@@ -1715,13 +1651,15 @@ function openModal(id) {
       </div>`;
   } else {
     title.textContent = '新規登録';
-    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+    // UTCズレのない日本ローカル日付をセット
+    document.getElementById('f-date').value = getLocalDateString();
     document.getElementById('f-buyer').value = '';
     document.getElementById('f-count').value = '';
     document.getElementById('f-item').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-qty').value = 1;
     document.getElementById('f-shipping').value = '';
+    
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
@@ -1747,8 +1685,11 @@ function openModal(id) {
 }
 
 function openEdit(id) { openModal(id); }
-function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-function onOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+function closeModal() {
+  const preview = document.getElementById('modal-img-preview');
+  revokePreviewUrl(preview);
+  document.getElementById('overlay').classList.remove('open');
+}
 
 /* ---- 品名：品番一覧からの選択 ---- */
 function toggleItemPicker(e) {
@@ -1799,9 +1740,7 @@ async function saveOrder(mode = 'close') {
   if (!date || !buyer || !item) { showToast('日付・購入者・品名は必須です'); return; }
   
   const data = {
-    date, buyer,
-    count, 
-    item,
+    date, buyer, count, item,
     price: parseInt(document.getElementById('f-price').value)||0,
     qty: parseInt(document.getElementById('f-qty').value)||1,
     shipping: parseInt(document.getElementById('f-shipping').value)||0,
@@ -1821,7 +1760,6 @@ async function saveOrder(mode = 'close') {
   }
   const order = orders.find(o => o.id === orderId);
 
-  // 画像の反映（IndexedDBへの保存/削除）
   if (tempImageBlobs) {
     try {
       await idbSet(orderId + '_thumb', tempImageBlobs.thumb);
@@ -1829,10 +1767,7 @@ async function saveOrder(mode = 'close') {
       order.hasImage = true;
       thumbUrlCache.delete(orderId);
       fullUrlCache.delete(orderId);
-    } catch(err) {
-      console.error(err);
-      showToast('画像の保存に失敗しました');
-    }
+    } catch(err) { console.error(err); showToast('画像の保存に失敗しました'); }
   } else if (imageRemoved && order.hasImage) {
     await idbDelete(orderId + '_thumb').catch(()=>{});
     await idbDelete(orderId + '_full').catch(()=>{});
@@ -1859,10 +1794,8 @@ async function saveOrder(mode = 'close') {
     
     removeSelectedImage();
     suggestCount(buyer);
-    
-    showToast('同名として保存しました。品名を入力してください。');
+    showToast('同名として保存しました。');
     document.getElementById('f-item').focus();
-    
   } else if (mode === 'different') {
     document.getElementById('f-buyer').value = '';
     document.getElementById('f-count').value = '';
@@ -1878,10 +1811,8 @@ async function saveOrder(mode = 'close') {
     ta2.style.height = '80px';
     
     removeSelectedImage();
-    
-    showToast('受注を保存しました。別の購入者を入力してください。');
+    showToast('受注を保存しました。');
     document.getElementById('f-buyer').focus();
-    
   } else {
     closeModal();
   }
@@ -1891,14 +1822,12 @@ function deleteOrder() {
   showConfirm('この受注を削除しますか？', async () => {
     const target = orders.find(o => o.id === editId);
     orders = orders.filter(o => o.id !== editId);
-
     if (target && target.hasImage) {
       await idbDelete(editId + '_thumb').catch(()=>{});
       await idbDelete(editId + '_full').catch(()=>{});
       thumbUrlCache.delete(editId);
       fullUrlCache.delete(editId);
     }
-
     recalculateAllCounts();
     save(); closeModal(); render();
   });
@@ -1923,7 +1852,7 @@ function exportCSV() {
   const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `受注管理_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href = url; a.download = `受注管理_${getLocalDateString()}.csv`;
   a.click(); URL.revokeObjectURL(url);
   closeSettings();
 }
@@ -1943,14 +1872,12 @@ async function backupData() {
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `受注管理_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.href = url; a.download = `受注管理_backup_${getLocalDateString()}.json`;
   a.click(); URL.revokeObjectURL(url);
   closeSettings();
 }
 
-function restoreData() {
-  document.getElementById('restoreFileInput').click();
-}
+function restoreData() { document.getElementById('restoreFileInput').click(); }
 function onRestoreFile(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -1992,9 +1919,7 @@ function onRestoreFile(e) {
               await idbSet(order.id + '_full', full);
               order.hasImage = true;
             }
-          } catch(imgErr) {
-            console.error('画像の復元に失敗しました:', order.id, imgErr);
-          }
+          } catch(imgErr) { console.error('画像復元失敗:', order.id, imgErr); }
           delete order.image; delete order.imageThumb; delete order.imageFull;
           newOrders.push(order);
         }
@@ -2011,7 +1936,7 @@ function onRestoreFile(e) {
         showToast('復元が完了しました');
       } catch(err) {
         console.error(err);
-        showToast('ファイルの読み込みに失敗しました。正しいバックアップファイルを選択してください。');
+        showToast('復元に失敗しました。');
       }
     });
   };
@@ -2029,8 +1954,7 @@ function deleteAllData() {
   });
 }
 
-/* ===== INIT ===== */
-/* ===== PRODUCT (品番管理) ===== */
+/* ===== PRODUCT ===== */
 let tempProductImageBlobs = null;
 let productImageRemoved = false;
 const productThumbUrlCache = new Map();
@@ -2174,7 +2098,7 @@ async function openProductDetail(id) {
 
   if (p.hasImage) {
     try {
-      // プレビュー用に高解像度画像（_full）を取得して表示を鮮明化
+      // _fullを取得して画質をクリアに表示
       const blob = await idbGet('product_' + p.id + '_full');
       if (blob) {
         const url = URL.createObjectURL(blob);
@@ -2182,7 +2106,6 @@ async function openProductDetail(id) {
         if (img) img.src = url;
       }
     } catch(e) {
-      // フォールバック
       const thumbBlob = await idbGet('product_' + p.id + '_thumb');
       if (thumbBlob) {
         const url = URL.createObjectURL(thumbBlob);
@@ -2196,7 +2119,6 @@ async function openProductDetail(id) {
     closeProductDetail();
     openProductModal(p.id);
   };
-
   document.getElementById('productDetailOverlay').classList.add('open');
 }
 function closeProductDetail() { document.getElementById('productDetailOverlay').classList.remove('open'); }
@@ -2212,16 +2134,15 @@ async function openProductImagePreview(id, e) {
     if (!blob) return;
     const url = URL.createObjectURL(blob);
     img.src = url;
-  } catch(err) {
-    console.error(err);
-  }
+  } catch(err) { console.error(err); }
 }
 
 /* ---- 品番 自動採番 ---- */
 function suggestNextProductNumber(letter, excludeId) {
   letter = (letter || 'A').toUpperCase();
   const used = products.filter(p => p.codeLetter === letter && p.id !== excludeId)
-    .map(p => p.codeNumber).sort((a,b)=>a-b);
+    .map(p => parseInt(p.codeNumber, 10) || 0) // キャストして確実な数値として比較
+    .sort((a,b)=>a-b);
   let n = 1;
   for (const u of used) {
     if (u === n) n++;
@@ -2246,9 +2167,10 @@ function openProductModal(id) {
     document.getElementById('p-code-num').value = p.codeNumber || '';
     document.getElementById('p-name').value = p.name || '';
     document.getElementById('p-price').value = p.price || '';
+    
     const ta = document.getElementById('p-note');
     ta.value = p.note || '';
-    setTimeout(() => autoResize(ta), 0);
+    setTimeout(() => autoResize(ta), 50); // 自動リサイズ初期発火
 
     const hasHistory = (p.history||[]).length > 0;
     document.getElementById('p-history-toggle').checked = hasHistory;
@@ -2260,7 +2182,7 @@ function openProductModal(id) {
       const preview = document.getElementById('product-img-preview');
       idbGet('product_' + p.id + '_thumb').then(blob => {
         if (!blob) return;
-        if (preview.dataset.blobUrl) URL.revokeObjectURL(preview.dataset.blobUrl);
+        revokePreviewUrl(preview);
         const url = URL.createObjectURL(blob);
         preview.src = url;
         preview.dataset.blobUrl = url;
@@ -2298,11 +2220,14 @@ function openProductModal(id) {
         <button class="btn-continue" onclick="saveProduct('same')">連続登録</button>
       </div>`;
   }
-
   document.getElementById('productOverlay').classList.add('open');
 }
-function closeProductModal() { document.getElementById('productOverlay').classList.remove('open'); }
-function onProductOverlayClick(e) { if (e.target === document.getElementById('productOverlay')) closeProductModal(); }
+
+function closeProductModal() {
+  const preview = document.getElementById('product-img-preview');
+  revokePreviewUrl(preview);
+  document.getElementById('productOverlay').classList.remove('open');
+}
 
 function toggleProductHistorySection() {
   const checked = document.getElementById('p-history-toggle').checked;
@@ -2338,7 +2263,7 @@ async function onProductImageSelected(e) {
     productImageRemoved = false;
 
     const preview = document.getElementById('product-img-preview');
-    if (preview.dataset.blobUrl) URL.revokeObjectURL(preview.dataset.blobUrl);
+    revokePreviewUrl(preview);
     const url = URL.createObjectURL(thumb);
     preview.src = url;
     preview.dataset.blobUrl = url;
@@ -2349,13 +2274,14 @@ async function onProductImageSelected(e) {
     showToast('画像の読み込みに失敗しました');
   }
 }
+
 function removeSelectedProductImage() {
   tempProductImageBlobs = null;
   productImageRemoved = true;
   const fileInput = document.getElementById('p-image-input');
   if (fileInput) fileInput.value = '';
   const preview = document.getElementById('product-img-preview');
-  if (preview.dataset.blobUrl) { URL.revokeObjectURL(preview.dataset.blobUrl); delete preview.dataset.blobUrl; }
+  revokePreviewUrl(preview);
   preview.src = '';
   preview.style.display = 'none';
   document.getElementById('p-btn-del-img').style.display = 'none';
@@ -2408,10 +2334,7 @@ async function saveProduct(mode = 'close') {
       await idbSet('product_' + productId + '_full', tempProductImageBlobs.full);
       product.hasImage = true;
       productThumbUrlCache.delete(productId);
-    } catch(err) {
-      console.error(err);
-      showToast('画像の保存に失敗しました');
-    }
+    } catch(err) { console.error(err); showToast('画像の保存に失敗しました'); }
   } else if (productImageRemoved && product.hasImage) {
     await idbDelete('product_' + productId + '_thumb').catch(()=>{});
     await idbDelete('product_' + productId + '_full').catch(()=>{});
@@ -2472,7 +2395,6 @@ async function init() {
     ];
     save();
   }
-
   recalculateAllCounts();
   render();
 }
