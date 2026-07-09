@@ -91,6 +91,7 @@ header h1 { font-size: 17px; font-weight: 700; color: var(--text); letter-spacin
 .stat { display: flex; flex-direction: column; align-items: center; flex: 1 1 0; text-align: center; }
 .stat-num { font-size: 15px; font-weight: 700; color: var(--text); }
 .stat-label { font-size: 10px; color: var(--text-sub); margin-top: 3px; white-space: nowrap; font-weight: 500; }
+.stat-sub { font-size: 9px; color: var(--text-muted); white-space: nowrap; margin-top: 1px; }
 .stat-divider { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
 
 /* ===== TOOLBAR ===== */
@@ -206,6 +207,18 @@ td.actions { padding: 0; min-width: 40px; }
 .auto-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+/* ---- 品名入力：品番一覧プルダウン選択 ---- */
+.item-picker-btn { flex-shrink: 0; width: 44px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.item-picker-btn:active { background: var(--bg); }
+.item-picker-btn svg { width: 16px; height: 16px; }
+.item-picker-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; max-height: 260px; overflow-y: auto; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15); z-index: 20; }
+.item-picker-dropdown.open { display: block; }
+.item-picker-row { padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 13px; }
+.item-picker-row:last-child { border-bottom: none; }
+.item-picker-row:active { background: var(--bg); }
+.item-picker-code { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-bg); border-radius: 6px; padding: 1px 6px; margin-right: 6px; }
+.item-picker-empty { padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
 /* ===== MODAL FOOTER BUTTONS ===== */
 .modal-footer { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); background: #f8fafc; }
 .footer-row-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -288,6 +301,69 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .customer-jump-btn:active { background: var(--bg); }
 .customer-jump-btn svg { width: 14px; height: 14px; }
 .customer-furigana { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 11px; font-family: inherit; background: var(--bg); color: var(--text-sub); outline: none; }
+
+/* ===== PRODUCT (品番管理) ===== */
+.code-input-row { display: flex; align-items: center; gap: 8px; }
+.code-input-row input { text-align: center; }
+.code-input-row .code-alpha { flex: 0 0 76px; text-transform: uppercase; }
+.code-input-row .code-sep { font-size: 16px; font-weight: 700; color: var(--text-muted); flex-shrink: 0; }
+.code-input-row .code-num { flex: 1; }
+.code-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.checkbox-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); }
+.checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-sub); }
+.history-rows { margin-top: 10px; }
+.history-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 8px; align-items: center; }
+.history-row input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; width: 100%; }
+.history-row input:focus { border-color: var(--accent); }
+.history-row-del { background: #fee2e2; border: none; border-radius: 8px; width: 30px; height: 34px; color: #dc2626; font-size: 13px; cursor: pointer; flex-shrink: 0; }
+.history-add-btn { margin-top: 4px; }
+@media (max-width: 480px) {
+  .history-row { grid-template-columns: 1fr 1fr; grid-template-areas: "date buyer" "media account" "del del"; }
+  .history-row input:nth-child(1) { grid-area: date; }
+  .history-row input:nth-child(2) { grid-area: buyer; }
+  .history-row input:nth-child(3) { grid-area: media; }
+  .history-row input:nth-child(4) { grid-area: account; }
+  .history-row-del { grid-area: del; width: 100%; }
+}
+.product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px; box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04); overflow: hidden; cursor: pointer; transition: box-shadow 0.15s; }
+.product-card:active { box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.08); }
+.product-card-inner { display: flex; gap: 12px; padding: 14px 16px; align-items: flex-start; background: linear-gradient(135deg, #ffffff 0%, var(--accent-bg) 160%); }
+.product-thumb, .product-thumb-placeholder { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--bg); border: 1px solid var(--border); flex-shrink: 0; }
+.product-thumb-placeholder { display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.product-thumb-placeholder svg { width: 22px; height: 22px; }
+.product-main { min-width: 0; flex: 1 1 auto; }
+.product-code-chip { display: inline-block; font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-bg); border-radius: 6px; padding: 2px 8px; margin-bottom: 5px; letter-spacing: 0.02em; }
+.product-name-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.product-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.product-price { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.product-note { font-size: 12px; color: var(--text-sub); margin-top: 4px; white-space: pre-wrap; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.product-history-badge { font-size: 11px; color: var(--text-muted); margin-top: 6px; display: inline-flex; align-items: center; gap: 3px; }
+.product-history-badge svg { width: 12px; height: 12px; }
+
+/* ---- 品番詳細（アコーディオン・画像拡大）---- */
+.detail-image-wrap { width: 100%; border-radius: 12px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); cursor: zoom-in; position: relative; }
+.detail-image-wrap img { width: 100%; max-height: 260px; object-fit: cover; display: block; }
+.detail-image-placeholder { width: 100%; height: 160px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); background: var(--bg); border-radius: 12px; border: 1px solid var(--border); }
+.detail-image-placeholder svg { width: 32px; height: 32px; }
+.detail-top-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.detail-name { font-size: 18px; font-weight: 800; color: var(--text); }
+.detail-price { font-size: 18px; font-weight: 800; color: var(--accent); white-space: nowrap; }
+.detail-accordion { border: 1px solid var(--border); border-radius: 12px; margin-top: 12px; overflow: hidden; }
+.detail-accordion-head { display: flex; align-items: center; justify-content: space-between; padding: 13px 14px; cursor: pointer; background: var(--bg); user-select: none; }
+.detail-accordion-head-label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--text-sub); }
+.detail-accordion-head-label svg.icon { width: 15px; height: 15px; color: var(--text-muted); }
+.detail-accordion-chevron { width: 16px; height: 16px; color: var(--text-muted); transition: transform 0.2s; flex-shrink: 0; }
+.detail-accordion.open .detail-accordion-chevron { transform: rotate(180deg); }
+.detail-accordion-body { display: none; padding: 0 14px 14px; }
+.detail-accordion.open .detail-accordion-body { display: block; border-top: 1px solid var(--border); padding-top: 12px; }
+.detail-note-text { font-size: 13px; color: var(--text); white-space: pre-wrap; line-height: 1.6; }
+.detail-history-item { padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 12px; color: var(--text-sub); line-height: 1.6; }
+.detail-history-item:last-child { border-bottom: none; }
+.detail-history-item .h-date-tag { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-bg); border-radius: 6px; padding: 1px 7px; margin-right: 6px; }
+
+/* ---- 発送日セル・記録モーダル ---- */
+.ship-date-mark { font-size: 12px; font-weight: 700; color: var(--accent); }
 .customer-furigana:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 .customer-stats { display: flex; gap: 14px; margin-top: 8px; }
 .customer-stat { flex: 1; text-align: center; background: var(--bg); border-radius: 8px; padding: 8px 4px; }
@@ -334,6 +410,9 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       </button>
       <button class="gear-btn" onclick="openCustomerList()" aria-label="顧客一覧">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+      <button class="gear-btn" onclick="openProductList()" aria-label="品番管理">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24H4a1 1 0 0 0-1 1v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.59-4.59a2 2 0 0 0 0-2.83z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
       </button>
       <button class="gear-btn" onclick="openSettings()" aria-label="設定">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -391,11 +470,21 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       </div>
       <div class="form-row" style="margin-top:14px">
         <label>品名</label>
-        <input type="text" id="f-item" placeholder="アクセサリー">
+        <div style="position:relative; display:flex; gap:8px;">
+          <input type="text" id="f-item" placeholder="アクセサリー" style="flex:1;">
+          <button type="button" class="item-picker-btn" onclick="toggleItemPicker(event)" aria-label="品番から選択">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="item-picker-dropdown" id="itemPickerDropdown"></div>
+        </div>
       </div>
       <div class="form-row-2">
         <div class="form-row" style="margin:0"><label>単価 (円)</label><input type="number" id="f-price" placeholder="5000" min="0"></div>
         <div class="form-row" style="margin:0"><label>数量</label><input type="number" id="f-qty" placeholder="1" min="1" value="1"></div>
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <label>送料 (円・任意)</label>
+        <input type="number" id="f-shipping" placeholder="0" min="0">
       </div>
       
       <!-- 画像選択エリア -->
@@ -425,7 +514,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 </div>
 
 <!-- 画像拡大プレビューモーダル（拡大表示専用の高解像度画像を読み込みます） -->
-<div class="overlay" id="imgOverlay" onclick="closeImgPreview()" style="justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.75);">
+<div class="overlay" id="imgOverlay" onclick="closeImgPreview()" style="justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.75); z-index: 350;">
   <img id="enlargedImg" src="" style="width: 100%; max-width: 640px; max-height: 85vh; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain; background:#111;">
 </div>
 
@@ -494,6 +583,103 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     <div class="modal-body" id="customerListBody" style="padding:12px 16px;"></div>
   </div>
 </div>
+
+<!-- 品番一覧（フルスクリーン） -->
+<div class="overlay" id="productListOverlay" onclick="onProductListOverlayClick(event)">
+  <div class="modal" style="max-width:none !important; width:100%; height:100%; max-height:100%; border-radius:0 !important; margin:0;">
+    <div class="modal-header">
+      <span class="modal-title">品番管理</span>
+      <button class="close-btn" onclick="closeProductList()">✕</button>
+    </div>
+    <div class="toolbar" style="flex-wrap:wrap;">
+      <div class="search-wrap" style="flex:1 1 0; min-width:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" id="productSearchInput" type="search" placeholder="品番・品名・金額・備考・履歴で検索" oninput="onProductSearch(this.value)">
+        <button class="search-clear" id="productSearchClear" onclick="clearProductSearch()">✕</button>
+      </div>
+      <button class="add-btn" style="flex-shrink:0;" onclick="openProductModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        新規登録
+      </button>
+    </div>
+    <div class="modal-body" id="productListBody" style="padding:12px 16px;"></div>
+    <div id="productEmptyState" style="display:none; text-align:center; padding:60px 20px; color:var(--text-muted);">
+      <p id="productEmptyMsg">品番データがありません</p>
+      <p style="font-size:13px;margin-top:6px" id="productEmptySubMsg">「新規登録」から追加してください</p>
+    </div>
+  </div>
+</div>
+
+<!-- 品番登録モーダル -->
+<div class="overlay" id="productOverlay" onclick="onProductOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="productModalTitle">品番登録</span>
+      <button class="close-btn" onclick="closeProductModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>品番</label>
+        <div class="code-input-row">
+          <input type="text" id="p-code-alpha" class="code-alpha" maxlength="4" placeholder="A">
+          <span class="code-sep">-</span>
+          <input type="number" id="p-code-num" class="code-num" min="1" placeholder="自動採番">
+        </div>
+        <p class="code-hint">未入力の場合、アルファベットは「A」、数字はそのアルファベット内で未使用の一番若い番号が自動で割り当てられます。</p>
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>品名</label>
+        <input type="text" id="p-name" placeholder="ピアス（パール）">
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <label>金額 (円・任意)</label>
+        <input type="number" id="p-price" placeholder="3000" min="0">
+      </div>
+
+      <!-- 画像選択エリア -->
+      <div class="form-row" style="margin-top:14px">
+        <label>画像登録 (任意)</label>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="file" id="p-image-input" accept="image/*" onchange="onProductImageSelected(event)" style="display:none">
+          <button type="button" class="btn-continue" style="width:auto; padding:8px 14px; margin:0;" onclick="document.getElementById('p-image-input').click()">画像を選択</button>
+          <button type="button" id="p-btn-del-img" class="btn-delete" style="width:auto; padding:8px 14px; margin:0; display:none;" onclick="removeSelectedProductImage()">削除</button>
+        </div>
+        <img id="product-img-preview" src="" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 10px; display: none; object-fit: cover; border: 1px solid var(--border);">
+      </div>
+
+      <div class="form-row" style="margin-top:14px">
+        <label>備考 (任意)</label>
+        <textarea class="auto-textarea" id="p-note" placeholder="素材、サイズ、仕入れ先など" oninput="autoResize(this)"></textarea>
+      </div>
+
+      <div class="form-row" style="margin-top:18px">
+        <label class="checkbox-row" style="text-transform:none;">
+          <input type="checkbox" id="p-history-toggle" onchange="toggleProductHistorySection()">
+          <span>販売・使用履歴を記録する</span>
+        </label>
+        <div id="p-history-section" style="display:none; margin-top:10px;">
+          <div class="history-rows" id="p-history-rows"></div>
+          <button type="button" class="btn-continue history-add-btn" style="width:auto; padding:8px 14px;" onclick="addProductHistoryRow()">＋ 履歴を追加</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="productModalFooter"></div>
+  </div>
+</div>
+
+<!-- 品番詳細モーダル（画像拡大・アコーディオン表示） -->
+<div class="overlay" id="productDetailOverlay" onclick="onProductDetailOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="productDetailTitle">品番詳細</span>
+      <button class="close-btn" onclick="closeProductDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="productDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-save" id="productDetailEditBtn">編集する</button>
+    </div>
+  </div>
+</div>
 <!-- アプリ内蔵の確認ダイアログ（環境依存のネイティブconfirm()を使わないため）-->
 <div class="overlay" id="confirmOverlay" style="z-index:400; justify-content:center; align-items:center;">
   <div class="modal" style="max-width:320px !important; border-radius:16px !important;">
@@ -508,6 +694,34 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     </div>
   </div>
 </div>
+
+<!-- 発送日記録モーダル -->
+<div class="overlay" id="shipOverlay" onclick="onShipOverlayClick(event)" style="justify-content:center; align-items:center;">
+  <div class="modal" style="max-width:320px !important; border-radius:16px !important;">
+    <div class="modal-header">
+      <span class="modal-title">発送日を記録</span>
+      <button class="close-btn" onclick="closeShipModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="shipQuestionText" style="font-size:14px; color:var(--text); line-height:1.6; margin-bottom:16px;">本日発送しましたか？</p>
+      <div class="footer-row-split" id="shipYesNoRow">
+        <button class="btn-cancel" onclick="onShipNo()">いいえ</button>
+        <button class="btn-save" onclick="onShipYes()">はい（本日）</button>
+      </div>
+      <div id="shipDatePickRow" style="display:none;">
+        <div class="form-row">
+          <label>発送日を選択</label>
+          <input type="date" id="ship-date-input">
+        </div>
+        <div class="footer-row-split">
+          <button class="btn-cancel" onclick="closeShipModal()">キャンセル</button>
+          <button class="btn-save" onclick="onShipDateConfirm()">設定</button>
+        </div>
+      </div>
+      <button type="button" class="btn-delete" id="shipClearBtn" style="width:100%; margin-top:14px; display:none;" onclick="onShipClear()">未発送に戻す</button>
+    </div>
+  </div>
+</div>
 <input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="onRestoreFile(event)">
 
 <script>
@@ -515,9 +729,13 @@ const STORAGE_KEY = 'order_manager_v1';
 const ALIAS_KEY = 'order_manager_aliases_v1';
 const MEMO_KEY = 'order_manager_customer_memos_v1';
 const FURIGANA_KEY = 'order_manager_customer_furigana_v1';
+const PRODUCT_KEY = 'order_manager_products_v1';
 let orders = [];
+let products = [];
 let editId = null;
+let editProductId = null;
 let searchQuery = '';
+let productSearchQuery = '';
 let openMonths = {};
 let sortAsc = false;
 
@@ -573,10 +791,13 @@ async function load() {
   try { customerAliases = JSON.parse(localStorage.getItem(ALIAS_KEY) || '{}'); } catch(e) { customerAliases = {}; }
   try { customerMemos = JSON.parse(localStorage.getItem(MEMO_KEY) || '{}'); } catch(e) { customerMemos = {}; }
   try { customerFurigana = JSON.parse(localStorage.getItem(FURIGANA_KEY) || '{}'); } catch(e) { customerFurigana = {}; }
+  try { products = JSON.parse(localStorage.getItem(PRODUCT_KEY) || '[]'); } catch(e) { products = []; }
   await migrateLegacyImages();
 }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
+function saveProducts() { localStorage.setItem(PRODUCT_KEY, JSON.stringify(products)); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function esc(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ===== IMAGE STORAGE (IndexedDB) ===== */
 const IMG_DB_NAME = 'orderImagesDB';
@@ -917,31 +1138,30 @@ function toggleStatus(id, field) {
 
   const cells = document.querySelectorAll(`[data-toggle-id="${id}"]`);
   cells.forEach(cell => {
-    const f = cell.dataset.toggleField;
-    const type = (f === 'sent' || f === 'arrived') ? 'check' : 'on';
-    cell.innerHTML = markEl(o[f], type);
+    if (cell.dataset.toggleField === field) cell.innerHTML = markEl(o[field], 'on');
   });
 
   renderSummary();
 
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
-  
+  refreshCompletionBadge(id);
+}
+
+function refreshCompletionBadge(id) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
   const isCompleted = !isIncomplete(o);
-  const firstCell = document.querySelector(`[data-toggle-id="${id}"]`);
-  if (firstCell) {
-    const tr = firstCell.closest('tr');
-    if (tr) {
-      const buyerTd = tr.querySelector('.buyer-cell');
-      if (buyerTd) {
-        const existingBadge = buyerTd.querySelector('.kanryo-badge');
-        if (existingBadge) existingBadge.remove();
-        
-        if (isCompleted) {
-          buyerTd.insertAdjacentHTML('afterbegin', '<span class="kanryo-badge">完了</span>');
-        }
-      }
-    }
+  const anyCell = document.querySelector(`[data-toggle-id="${id}"], [data-ship-id="${id}"]`);
+  if (!anyCell) return;
+  const tr = anyCell.closest('tr');
+  if (!tr) return;
+  const buyerTd = tr.querySelector('.buyer-cell');
+  if (!buyerTd) return;
+  const existingBadge = buyerTd.querySelector('.kanryo-badge');
+  if (existingBadge) existingBadge.remove();
+  if (isCompleted) {
+    buyerTd.insertAdjacentHTML('afterbegin', '<span class="kanryo-badge">完了</span>');
   }
 }
 
@@ -969,12 +1189,69 @@ function updateMonthBadge(m) {
   }
 }
 function isIncomplete(o) {
-  return !o.paid || !o.packed || !o.sent || !o.arrived;
+  return !o.paid || !o.packed || !o.sentDate;
 }
 function markEl(on, type) {
   const cls = type === 'check' ? 'check' : 'on';
   const sym = type === 'check' ? '✓' : '○';
   return `<span class="toggle-mark ${on ? cls : ''}">${on ? sym : ''}</span>`;
+}
+
+/* ===== 発送日記録モーダル ===== */
+let shipTargetId = null;
+function openShipModal(id) {
+  shipTargetId = id;
+  const o = orders.find(o => o.id === id);
+  document.getElementById('shipQuestionText').textContent = '本日発送しましたか？';
+  document.getElementById('shipYesNoRow').style.display = 'grid';
+  document.getElementById('shipDatePickRow').style.display = 'none';
+  document.getElementById('shipClearBtn').style.display = (o && o.sentDate) ? 'block' : 'none';
+  document.getElementById('shipOverlay').classList.add('open');
+}
+function closeShipModal() {
+  document.getElementById('shipOverlay').classList.remove('open');
+  shipTargetId = null;
+}
+function onShipOverlayClick(e) { if (e.target === document.getElementById('shipOverlay')) closeShipModal(); }
+
+function onShipYes() {
+  setShipDate(new Date().toISOString().slice(0,10));
+}
+function onShipNo() {
+  const o = orders.find(o => o.id === shipTargetId);
+  document.getElementById('shipYesNoRow').style.display = 'none';
+  const dateInput = document.getElementById('ship-date-input');
+  dateInput.value = (o && o.sentDate) || new Date().toISOString().slice(0,10);
+  document.getElementById('shipDatePickRow').style.display = 'block';
+}
+function onShipDateConfirm() {
+  const val = document.getElementById('ship-date-input').value;
+  if (!val) { showToast('日付を選択してください'); return; }
+  setShipDate(val);
+}
+function onShipClear() {
+  setShipDate('');
+}
+function setShipDate(dateStr) {
+  const o = orders.find(o => o.id === shipTargetId);
+  if (!o) { closeShipModal(); return; }
+  o.sentDate = dateStr || '';
+  save();
+
+  const cell = document.querySelector(`[data-ship-id="${o.id}"]`);
+  if (cell) {
+    cell.innerHTML = o.sentDate
+      ? `<span class="ship-date-mark">${fmtDate(o.sentDate)}</span>`
+      : `<span class="toggle-mark"></span>`;
+  }
+
+  renderSummary();
+  const m = getMonth(o.date) || 'none';
+  updateMonthBadge(m);
+  refreshCompletionBadge(o.id);
+
+  closeShipModal();
+  showToast(o.sentDate ? '発送日を記録しました' : '未発送に戻しました');
 }
 
 /* ===== ACCORDION ===== */
@@ -989,15 +1266,21 @@ function toggleMonth(m) {
 
 /* ===== RENDER ===== */
 function renderSummary() {
-  const total = orders.reduce((s,o) => s+(o.price||0)*(o.qty||1), 0);
-  const paid = orders.filter(o=>o.paid).reduce((s,o) => s+(o.price||0)*(o.qty||1), 0);
-  const unpaid = total - paid;
-  const unsent = orders.filter(o=>!o.sent).length;
+  const productTotal = orders.reduce((s,o) => s+(o.price||0)*(o.qty||1), 0);
+  const shippingTotal = orders.reduce((s,o) => s+(o.shipping||0), 0);
+  const grandTotal = productTotal + shippingTotal;
+  const paid = orders.filter(o=>o.paid).reduce((s,o) => s+(o.price||0)*(o.qty||1)+(o.shipping||0), 0);
+  const unpaid = grandTotal - paid;
+  const unsent = orders.filter(o=>!o.sentDate).length;
   
   document.getElementById('summaryBar').innerHTML = `
     <div class="stat"><span class="stat-num">${orders.length}</span><span class="stat-label">件数</span></div>
     <div class="stat-divider"></div>
-    <div class="stat"><span class="stat-num">¥${fmt(total)}</span><span class="stat-label">合計金額</span></div>
+    <div class="stat">
+      <span class="stat-num">¥${fmt(grandTotal)}</span>
+      <span class="stat-sub">うち送料 ¥${fmt(shippingTotal)}</span>
+      <span class="stat-label">合計金額</span>
+    </div>
     <div class="stat-divider"></div>
     <div class="stat"><span class="stat-num" style="color:var(--success)">¥${fmt(paid)}</span><span class="stat-label">入金済</span></div>
     <div class="stat-divider"></div>
@@ -1010,8 +1293,8 @@ function renderSummary() {
 function renderTable(list, q) {
   let html = `<table><thead><tr>
     <th>日付</th><th>回数</th><th>購入者</th><th>品名</th>
-    <th>単価</th><th>数量</th><th>金額</th><th>備考</th>
-    <th>入金</th><th>梱包</th><th>発送</th><th>到着</th><th>メモ</th><th></th>
+    <th>単価</th><th>数量</th><th>金額</th><th>送料</th><th>備考</th>
+    <th>入金</th><th>梱包</th><th>発送</th><th>メモ</th><th></th>
   </tr></thead><tbody>`;
   let prevDate = null;
   list.forEach(o => {
@@ -1044,11 +1327,11 @@ function renderTable(list, q) {
       <td class="right">¥${fmt(o.price||0)}</td>
       <td class="center">${o.qty||1}</td>
       <td class="right amount">¥${fmt(amt)}</td>
+      <td class="right" style="color:var(--text-sub);">${o.shipping ? '¥'+fmt(o.shipping) : ''}</td>
       <td class="note-cell">${q ? hl(noteDisplay, q) : noteDisplay}</td>
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="paid" onclick="toggleStatus('${o.id}','paid')">${markEl(o.paid,'on')}</td>
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="packed" onclick="toggleStatus('${o.id}','packed')">${markEl(o.packed,'on')}</td>
-      <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="sent" onclick="toggleStatus('${o.id}','sent')">${markEl(o.sent,'check')}</td>
-      <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="arrived" onclick="toggleStatus('${o.id}','arrived')">${markEl(o.arrived,'check')}</td>
+      <td class="toggle-cell ship-cell" data-ship-id="${o.id}" onclick="openShipModal('${o.id}')">${o.sentDate ? `<span class="ship-date-mark">${fmtDate(o.sentDate)}</span>` : `<span class="toggle-mark"></span>`}</td>
       <td class="note-cell">${q ? hl(note2Display, q) : note2Display}</td>
       <td class="actions"><button class="row-action-btn" onclick="openEdit('${o.id}')">…</button></td>
     </tr>`;
@@ -1395,6 +1678,7 @@ function openModal(id) {
     document.getElementById('f-item').value = o.item||'';
     document.getElementById('f-price').value = o.price||'';
     document.getElementById('f-qty').value = o.qty||1;
+    document.getElementById('f-shipping').value = o.shipping||'';
     const ta = document.getElementById('f-note');
     ta.value = o.note||'';
     setTimeout(() => autoResize(ta), 0);
@@ -1432,6 +1716,7 @@ function openModal(id) {
     document.getElementById('f-item').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-qty').value = 1;
+    document.getElementById('f-shipping').value = '';
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
@@ -1460,6 +1745,46 @@ function openEdit(id) { openModal(id); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 function onOverlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
+/* ---- 品名：品番一覧からの選択 ---- */
+function toggleItemPicker(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('itemPickerDropdown');
+  const willOpen = !dd.classList.contains('open');
+  if (willOpen) renderItemPicker();
+  dd.classList.toggle('open', willOpen);
+}
+function renderItemPicker() {
+  const dd = document.getElementById('itemPickerDropdown');
+  if (products.length === 0) {
+    dd.innerHTML = '<div class="item-picker-empty">品番登録がまだありません</div>';
+    return;
+  }
+  const sorted = products.slice().sort((a,b) => {
+    if (a.codeLetter !== b.codeLetter) return (a.codeLetter||'').localeCompare(b.codeLetter||'');
+    return (a.codeNumber||0) - (b.codeNumber||0);
+  });
+  dd.innerHTML = sorted.map(p => `
+    <div class="item-picker-row" data-id="${p.id}">
+      <span><span class="item-picker-code">${esc(p.code)}</span>${esc(p.name)}</span>
+      ${p.price ? `<span style="color:var(--text-sub);white-space:nowrap;">¥${fmt(p.price)}</span>` : ''}
+    </div>`).join('');
+}
+document.getElementById('itemPickerDropdown').addEventListener('click', (e) => {
+  const row = e.target.closest('.item-picker-row');
+  if (!row) return;
+  const p = products.find(p => p.id === row.dataset.id);
+  if (!p) return;
+  document.getElementById('f-item').value = p.name;
+  if (p.price) document.getElementById('f-price').value = p.price;
+  document.getElementById('itemPickerDropdown').classList.remove('open');
+});
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('itemPickerDropdown');
+  if (dd && dd.classList.contains('open') && !e.target.closest('.item-picker-btn') && !e.target.closest('#itemPickerDropdown')) {
+    dd.classList.remove('open');
+  }
+});
+
 async function saveOrder(mode = 'close') {
   const date = document.getElementById('f-date').value;
   const buyer = document.getElementById('f-buyer').value.trim();
@@ -1474,6 +1799,7 @@ async function saveOrder(mode = 'close') {
     item,
     price: parseInt(document.getElementById('f-price').value)||0,
     qty: parseInt(document.getElementById('f-qty').value)||1,
+    shipping: parseInt(document.getElementById('f-shipping').value)||0,
     note: document.getElementById('f-note').value.trim(),
     note2: document.getElementById('f-note2').value.trim()
   };
@@ -1486,7 +1812,7 @@ async function saveOrder(mode = 'close') {
     orderId = uid();
     const m = getMonth(date) || 'none';
     openMonths[m] = true;
-    orders.push({ id: orderId, paid:false, packed:false, sent:false, arrived:false, ...data });
+    orders.push({ id: orderId, paid:false, packed:false, ...data });
   }
   const order = orders.find(o => o.id === orderId);
 
@@ -1518,6 +1844,7 @@ async function saveOrder(mode = 'close') {
     document.getElementById('f-item').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-qty').value = 1;
+    document.getElementById('f-shipping').value = '';
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
@@ -1537,6 +1864,7 @@ async function saveOrder(mode = 'close') {
     document.getElementById('f-item').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-qty').value = 1;
+    document.getElementById('f-shipping').value = '';
     const ta = document.getElementById('f-note');
     ta.value = '';
     ta.style.height = '80px';
@@ -1577,13 +1905,13 @@ function closeSettings() { document.getElementById('settingsOverlay').classList.
 function onSettingsOverlayClick(e) { if (e.target === document.getElementById('settingsOverlay')) closeSettings(); }
 
 function exportCSV() {
-  const header = ['日付','回数','購入者','品名','単価','数量','金額','備考','入金','梱包','発送','到着','メモ'];
+  const header = ['日付','回数','購入者','品名','単価','数量','金額','送料','備考','入金','梱包','発送日','メモ'];
   // Excel等で開いた際の表示崩れを防ぐため、セル内の改行を半角スペースにエスケープ処理します
   const rows = orders.map(o => [
     o.date||'', o.count||'', o.buyer||'', o.item||'',
-    o.price||0, o.qty||1, (o.price||0)*(o.qty||1),
+    o.price||0, o.qty||1, (o.price||0)*(o.qty||1), o.shipping||0,
     (o.note||'').replace(/[\r\n]+/g, ' '),
-    o.paid?'○':'', o.packed?'○':'', o.sent?'✓':'', o.arrived?'✓':'',
+    o.paid?'○':'', o.packed?'○':'', o.sentDate||'',
     (o.note2||'').replace(/[\r\n]+/g, ' ')
   ]);
   const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
@@ -1698,17 +2026,436 @@ function deleteAllData() {
 }
 
 /* ===== INIT ===== */
+/* ===== PRODUCT (品番管理) ===== */
+let tempProductImageBlobs = null;
+let productImageRemoved = false;
+const productThumbUrlCache = new Map();
+
+function openProductList() {
+  document.getElementById('productListOverlay').classList.add('open');
+  renderProductList();
+}
+function closeProductList() {
+  document.getElementById('productListOverlay').classList.remove('open');
+}
+function onProductListOverlayClick(e) { if (e.target === document.getElementById('productListOverlay')) closeProductList(); }
+
+function onProductSearch(val) {
+  productSearchQuery = val;
+  document.getElementById('productSearchClear').classList.toggle('visible', val.trim().length > 0);
+  renderProductList();
+}
+function clearProductSearch() {
+  productSearchQuery = '';
+  document.getElementById('productSearchInput').value = '';
+  document.getElementById('productSearchClear').classList.remove('visible');
+  renderProductList();
+}
+
+function productSearchText(p) {
+  const historyText = (p.history||[]).map(h => `${h.date||''} ${h.buyer||''} ${h.media||''} ${h.account||''}`).join(' ');
+  return `${p.code||''} ${p.name||''} ${p.price||''} ${p.note||''} ${historyText}`.toLowerCase();
+}
+
+function renderProductList() {
+  const body = document.getElementById('productListBody');
+  const emptyState = document.getElementById('productEmptyState');
+  const q = productSearchQuery.trim().toLowerCase();
+  let list = products.slice();
+  if (q) list = list.filter(p => productSearchText(p).includes(q));
+  list.sort((a,b) => {
+    if (a.codeLetter !== b.codeLetter) return (a.codeLetter||'').localeCompare(b.codeLetter||'');
+    return (a.codeNumber||0) - (b.codeNumber||0);
+  });
+
+  if (list.length === 0) {
+    body.innerHTML = '';
+    emptyState.style.display = 'block';
+    document.getElementById('productEmptyMsg').textContent = q ? `「${productSearchQuery}」に一致する品番がありません` : '品番データがありません';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  body.innerHTML = list.map(p => {
+    const historyCount = (p.history||[]).length;
+    return `<div class="product-card" data-action="open-product" data-id="${p.id}">
+      <div class="product-card-inner">
+        ${p.hasImage
+          ? `<img class="product-thumb" data-product-img-id="${p.id}" src="" alt="">`
+          : `<div class="product-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`}
+        <div class="product-main">
+          <span class="product-code-chip">${esc(p.code)}</span>
+          <div class="product-name-row">
+            <span class="product-name">${esc(p.name)}</span>
+            ${p.price ? `<span class="product-price">¥${fmt(p.price)}</span>` : ''}
+          </div>
+          ${p.note ? `<div class="product-note">${esc(p.note)}</div>` : ''}
+          ${historyCount ? `<div class="product-history-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>履歴${historyCount}件</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  hydrateProductThumbnails();
+}
+
+async function hydrateProductThumbnails() {
+  const imgs = document.querySelectorAll('img[data-product-img-id]');
+  for (const img of imgs) {
+    const id = img.dataset.productImgId;
+    let url = productThumbUrlCache.get(id);
+    if (!url) {
+      try {
+        const blob = await idbGet('product_' + id + '_thumb');
+        if (!blob) continue;
+        url = URL.createObjectURL(blob);
+        productThumbUrlCache.set(id, url);
+      } catch(e) { continue; }
+    }
+    img.src = url;
+  }
+}
+
+document.getElementById('productListBody').addEventListener('click', (e) => {
+  const card = e.target.closest('[data-action="open-product"]');
+  if (card) openProductDetail(card.dataset.id);
+});
+
+/* ---- 品番詳細（画像拡大・アコーディオン） ---- */
+async function openProductDetail(id) {
+  const p = products.find(p => p.id === id);
+  if (!p) return;
+  document.getElementById('productDetailTitle').textContent = p.code;
+
+  const historyItems = (p.history||[]).map(h => {
+    const parts = [h.buyer, h.media, h.account].filter(Boolean).join(' ・ ');
+    return `<div class="detail-history-item">${h.date ? `<span class="h-date-tag">${esc(h.date)}</span>` : ''}${esc(parts)}</div>`;
+  }).join('');
+
+  const body = document.getElementById('productDetailBody');
+  body.innerHTML = `
+    ${p.hasImage
+      ? `<div class="detail-image-wrap" onclick="openProductImagePreview('${p.id}', event)"><img src="" id="productDetailImg" alt=""></div>`
+      : `<div class="detail-image-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`}
+    <div class="detail-top-row">
+      <span class="detail-name">${esc(p.name)}</span>
+      ${p.price ? `<span class="detail-price">¥${fmt(p.price)}</span>` : ''}
+    </div>
+
+    <div class="detail-accordion" id="detailNoteAccordion">
+      <div class="detail-accordion-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="detail-accordion-head-label">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M8 6h8M8 10h8M8 14h5"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          備考
+        </span>
+        <svg class="detail-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="detail-accordion-body">
+        <div class="detail-note-text">${p.note ? esc(p.note) : '備考はありません'}</div>
+      </div>
+    </div>
+
+    <div class="detail-accordion" id="detailHistoryAccordion">
+      <div class="detail-accordion-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="detail-accordion-head-label">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+          販売・使用履歴 ${(p.history||[]).length ? `(${p.history.length})` : ''}
+        </span>
+        <svg class="detail-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="detail-accordion-body">
+        ${historyItems || '<div class="detail-note-text">履歴はありません</div>'}
+      </div>
+    </div>`;
+
+  if (p.hasImage) {
+    try {
+      const blob = await idbGet('product_' + p.id + '_thumb');
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const img = document.getElementById('productDetailImg');
+        if (img) img.src = url;
+      }
+    } catch(e) {}
+  }
+
+  document.getElementById('productDetailEditBtn').onclick = () => {
+    closeProductDetail();
+    openProductModal(p.id);
+  };
+
+  document.getElementById('productDetailOverlay').classList.add('open');
+}
+function closeProductDetail() { document.getElementById('productDetailOverlay').classList.remove('open'); }
+function onProductDetailOverlayClick(e) { if (e.target === document.getElementById('productDetailOverlay')) closeProductDetail(); }
+
+async function openProductImagePreview(id, e) {
+  if (e) e.stopPropagation();
+  const overlay = document.getElementById('imgOverlay');
+  const img = document.getElementById('enlargedImg');
+  overlay.classList.add('open');
+  try {
+    const blob = await idbGet('product_' + id + '_full');
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    img.src = url;
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+/* ---- 品番 自動採番 ---- */
+function suggestNextProductNumber(letter, excludeId) {
+  letter = (letter || 'A').toUpperCase();
+  const used = products.filter(p => p.codeLetter === letter && p.id !== excludeId)
+    .map(p => p.codeNumber).sort((a,b)=>a-b);
+  let n = 1;
+  for (const u of used) {
+    if (u === n) n++;
+    else if (u > n) break;
+  }
+  return n;
+}
+
+/* ---- 品番登録モーダル ---- */
+function openProductModal(id) {
+  editProductId = id || null;
+  const title = document.getElementById('productModalTitle');
+  const footer = document.getElementById('productModalFooter');
+
+  removeSelectedProductImage();
+  document.getElementById('p-history-rows').innerHTML = '';
+
+  if (editProductId) {
+    const p = products.find(p => p.id === editProductId);
+    title.textContent = '品番編集';
+    document.getElementById('p-code-alpha').value = p.codeLetter || '';
+    document.getElementById('p-code-num').value = p.codeNumber || '';
+    document.getElementById('p-name').value = p.name || '';
+    document.getElementById('p-price').value = p.price || '';
+    const ta = document.getElementById('p-note');
+    ta.value = p.note || '';
+    setTimeout(() => autoResize(ta), 0);
+
+    const hasHistory = (p.history||[]).length > 0;
+    document.getElementById('p-history-toggle').checked = hasHistory;
+    document.getElementById('p-history-section').style.display = hasHistory ? 'block' : 'none';
+    (p.history||[]).forEach(h => addProductHistoryRow(h));
+
+    if (p.hasImage) {
+      productImageRemoved = false;
+      const preview = document.getElementById('product-img-preview');
+      idbGet('product_' + p.id + '_thumb').then(blob => {
+        if (!blob) return;
+        if (preview.dataset.blobUrl) URL.revokeObjectURL(preview.dataset.blobUrl);
+        const url = URL.createObjectURL(blob);
+        preview.src = url;
+        preview.dataset.blobUrl = url;
+        preview.style.display = 'block';
+        document.getElementById('p-btn-del-img').style.display = 'inline-block';
+      });
+    }
+
+    footer.innerHTML = `
+      <div class="footer-grid-new">
+        <div class="footer-row-primary">
+          <button class="btn-cancel" onclick="closeProductModal()">キャンセル</button>
+          <button class="btn-save" onclick="saveProduct('close')">保存</button>
+        </div>
+        <button class="btn-delete" onclick="deleteProduct()">削除</button>
+      </div>`;
+  } else {
+    title.textContent = '品番登録';
+    document.getElementById('p-code-alpha').value = '';
+    document.getElementById('p-code-num').value = '';
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-price').value = '';
+    const ta = document.getElementById('p-note');
+    ta.value = '';
+    ta.style.height = '80px';
+    document.getElementById('p-history-toggle').checked = false;
+    document.getElementById('p-history-section').style.display = 'none';
+
+    footer.innerHTML = `
+      <div class="footer-grid-new">
+        <div class="footer-row-primary">
+          <button class="btn-cancel" onclick="closeProductModal()">キャンセル</button>
+          <button class="btn-save" onclick="saveProduct('close')">保存</button>
+        </div>
+        <button class="btn-continue" onclick="saveProduct('same')">連続登録</button>
+      </div>`;
+  }
+
+  document.getElementById('productOverlay').classList.add('open');
+}
+function closeProductModal() { document.getElementById('productOverlay').classList.remove('open'); }
+function onProductOverlayClick(e) { if (e.target === document.getElementById('productOverlay')) closeProductModal(); }
+
+function toggleProductHistorySection() {
+  const checked = document.getElementById('p-history-toggle').checked;
+  const section = document.getElementById('p-history-section');
+  section.style.display = checked ? 'block' : 'none';
+  if (checked && document.getElementById('p-history-rows').children.length === 0) {
+    addProductHistoryRow();
+  }
+}
+
+function addProductHistoryRow(data) {
+  data = data || {};
+  const rows = document.getElementById('p-history-rows');
+  const row = document.createElement('div');
+  row.className = 'history-row';
+  row.innerHTML = `
+    <input type="date" class="h-date" value="${esc(data.date||'')}">
+    <input type="text" class="h-buyer" placeholder="顧客名" value="${esc(data.buyer||'')}">
+    <input type="text" class="h-media" placeholder="媒体" value="${esc(data.media||'')}">
+    <input type="text" class="h-account" placeholder="アカウント" value="${esc(data.account||'')}">
+    <button type="button" class="history-row-del" onclick="this.closest('.history-row').remove()">✕</button>`;
+  rows.appendChild(row);
+}
+
+/* ---- 画像処理（品番用）---- */
+async function onProductImageSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const img = await fileToImage(file);
+    const { thumb, full } = await makeThumbAndFull(img);
+    tempProductImageBlobs = { thumb, full };
+    productImageRemoved = false;
+
+    const preview = document.getElementById('product-img-preview');
+    if (preview.dataset.blobUrl) URL.revokeObjectURL(preview.dataset.blobUrl);
+    const url = URL.createObjectURL(thumb);
+    preview.src = url;
+    preview.dataset.blobUrl = url;
+    preview.style.display = 'block';
+    document.getElementById('p-btn-del-img').style.display = 'inline-block';
+  } catch(err) {
+    console.error(err);
+    showToast('画像の読み込みに失敗しました');
+  }
+}
+function removeSelectedProductImage() {
+  tempProductImageBlobs = null;
+  productImageRemoved = true;
+  const fileInput = document.getElementById('p-image-input');
+  if (fileInput) fileInput.value = '';
+  const preview = document.getElementById('product-img-preview');
+  if (preview.dataset.blobUrl) { URL.revokeObjectURL(preview.dataset.blobUrl); delete preview.dataset.blobUrl; }
+  preview.src = '';
+  preview.style.display = 'none';
+  document.getElementById('p-btn-del-img').style.display = 'none';
+}
+
+/* ---- 保存/削除 ---- */
+async function saveProduct(mode = 'close') {
+  const name = document.getElementById('p-name').value.trim();
+  if (!name) { showToast('品名は必須です'); return; }
+
+  let letter = document.getElementById('p-code-alpha').value.trim().toUpperCase().replace(/[^A-Z]/g, '');
+  if (!letter) letter = 'A';
+  const numStr = document.getElementById('p-code-num').value.trim();
+  let number = numStr ? parseInt(numStr, 10) : suggestNextProductNumber(letter, editProductId);
+  if (!number || number < 1) number = suggestNextProductNumber(letter, editProductId);
+
+  const dup = products.find(p => p.codeLetter === letter && p.codeNumber === number && p.id !== editProductId);
+  if (dup) { showToast(`品番 ${letter}-${number} はすでに使用されています`); return; }
+
+  const history = [...document.getElementById('p-history-rows').querySelectorAll('.history-row')].map(row => ({
+    date: row.querySelector('.h-date').value,
+    buyer: row.querySelector('.h-buyer').value.trim(),
+    media: row.querySelector('.h-media').value.trim(),
+    account: row.querySelector('.h-account').value.trim()
+  })).filter(h => h.date || h.buyer || h.media || h.account);
+
+  const data = {
+    codeLetter: letter,
+    codeNumber: number,
+    code: `${letter}-${number}`,
+    name,
+    price: parseInt(document.getElementById('p-price').value) || 0,
+    note: document.getElementById('p-note').value.trim(),
+    history
+  };
+
+  let productId;
+  if (editProductId) {
+    productId = editProductId;
+    Object.assign(products.find(p => p.id === editProductId), data);
+  } else {
+    productId = uid();
+    products.push({ id: productId, ...data });
+  }
+  const product = products.find(p => p.id === productId);
+
+  if (tempProductImageBlobs) {
+    try {
+      await idbSet('product_' + productId + '_thumb', tempProductImageBlobs.thumb);
+      await idbSet('product_' + productId + '_full', tempProductImageBlobs.full);
+      product.hasImage = true;
+      productThumbUrlCache.delete(productId);
+    } catch(err) {
+      console.error(err);
+      showToast('画像の保存に失敗しました');
+    }
+  } else if (productImageRemoved && product.hasImage) {
+    await idbDelete('product_' + productId + '_thumb').catch(()=>{});
+    await idbDelete('product_' + productId + '_full').catch(()=>{});
+    product.hasImage = false;
+    productThumbUrlCache.delete(productId);
+  }
+
+  saveProducts();
+  renderProductList();
+
+  if (mode === 'same') {
+    editProductId = null;
+    document.getElementById('productModalTitle').textContent = '品番登録';
+    document.getElementById('p-code-alpha').value = '';
+    document.getElementById('p-code-num').value = '';
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-price').value = '';
+    const ta = document.getElementById('p-note');
+    ta.value = '';
+    ta.style.height = '80px';
+    document.getElementById('p-history-toggle').checked = false;
+    document.getElementById('p-history-section').style.display = 'none';
+    document.getElementById('p-history-rows').innerHTML = '';
+    removeSelectedProductImage();
+    showToast('登録しました');
+    document.getElementById('p-name').focus();
+  } else {
+    closeProductModal();
+    showToast('保存しました');
+  }
+}
+
+function deleteProduct() {
+  showConfirm('この品番を削除しますか？', async () => {
+    const id = editProductId;
+    products = products.filter(p => p.id !== id);
+    saveProducts();
+    await idbDelete('product_' + id + '_thumb').catch(()=>{});
+    await idbDelete('product_' + id + '_full').catch(()=>{});
+    productThumbUrlCache.delete(id);
+    closeProductModal();
+    renderProductList();
+    showToast('削除しました');
+  });
+}
+
 async function init() {
   await load();
   if (orders.length === 0) {
     orders = [
-      {id:uid(),date:'2026-05-01',count:'',buyer:'山田',item:'アクセサリー',price:5000,qty:1,note:'予約',paid:true,packed:false,sent:false,arrived:false},
-      {id:uid(),date:'2026-05-20',count:'',buyer:'田中',item:'ピアス',price:2500,qty:2,note:'',paid:true,packed:true,sent:false,arrived:false},
-      {id:uid(),date:'2026-05-20',count:'',buyer:'',item:'資材',price:3000,qty:1,note:'100個/1ロット',paid:true,packed:true,sent:true,arrived:true},
-      {id:uid(),date:'2026-05-21',count:'2',buyer:'山田',item:'アクセサリー',price:2500,qty:1,note:'',paid:true,packed:false,sent:false,arrived:false},
-      {id:uid(),date:'2026-05-30',count:'',buyer:'佐藤',item:'布',price:2000,qty:2,note:'',paid:false,packed:false,sent:false,arrived:false},
-      {id:uid(),date:'2026-06-03',count:'',buyer:'山田',item:'ネックレス',price:6000,qty:1,note:'受注確定後に連絡あり\nサイズ変更希望',paid:false,packed:false,sent:false,arrived:false},
-      {id:uid(),date:'2026-06-10',count:'',buyer:'佐藤',item:'ピアス',price:2500,qty:3,note:'',paid:true,packed:true,sent:true,arrived:false},
+      {id:uid(),date:'2026-05-01',count:'',buyer:'山田',item:'アクセサリー',price:5000,qty:1,shipping:0,note:'予約',paid:true,packed:false,sentDate:''},
+      {id:uid(),date:'2026-05-20',count:'',buyer:'田中',item:'ピアス',price:2500,qty:2,shipping:370,note:'',paid:true,packed:true,sentDate:''},
+      {id:uid(),date:'2026-05-20',count:'',buyer:'',item:'資材',price:3000,qty:1,shipping:0,note:'100個/1ロット',paid:true,packed:true,sentDate:'2026-05-22'},
+      {id:uid(),date:'2026-05-21',count:'2',buyer:'山田',item:'アクセサリー',price:2500,qty:1,shipping:370,note:'',paid:true,packed:false,sentDate:''},
+      {id:uid(),date:'2026-05-30',count:'',buyer:'佐藤',item:'布',price:2000,qty:2,shipping:0,note:'',paid:false,packed:false,sentDate:''},
+      {id:uid(),date:'2026-06-03',count:'',buyer:'山田',item:'ネックレス',price:6000,qty:1,shipping:520,note:'受注確定後に連絡あり\nサイズ変更希望',paid:false,packed:false,sentDate:''},
+      {id:uid(),date:'2026-06-10',count:'',buyer:'佐藤',item:'ピアス',price:2500,qty:3,shipping:370,note:'',paid:true,packed:true,sentDate:'2026-06-12'},
     ];
     save();
   }
