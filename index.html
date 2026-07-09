@@ -194,7 +194,7 @@ td.actions { padding: 0; min-width: 40px; }
   .overlay { align-items: center; justify-content: center; }
   .modal { max-width: 480px !important; border-radius: 16px !important; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04) !important; }
 }
-.modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom); display: flex; flex-direction: column; }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; padding-bottom: env(safe-area-inset-bottom); display: flex; flex-direction: column; }
 .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 10; }
 .modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
 .close-btn { background: #f1f5f9; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sub); }
@@ -313,18 +313,23 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .checkbox-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); }
 .checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-sub); }
 .history-rows { margin-top: 10px; }
-.history-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 8px; align-items: center; }
-.history-row input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; width: 100%; }
+.history-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 8px; align-items: center; }
+.history-row input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; width: 100%; box-sizing: border-box; height: 34px; }
 .history-row input:focus { border-color: var(--accent); }
-.history-row-del { background: #fee2e2; border: none; border-radius: 8px; width: 30px; height: 34px; color: #dc2626; font-size: 13px; cursor: pointer; flex-shrink: 0; }
-.history-add-btn { margin-top: 4px; }
+.history-row-del { background: #fee2e2; border: none; border-radius: 8px; width: 30px; height: 34px; color: #dc2626; font-size: 13px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 @media (max-width: 480px) {
-  .history-row { grid-template-columns: 1fr 1fr; grid-template-areas: "date buyer" "media account" "del del"; }
-  .history-row input:nth-child(1) { grid-area: date; }
-  .history-row input:nth-child(2) { grid-area: buyer; }
-  .history-row input:nth-child(3) { grid-area: media; }
-  .history-row input:nth-child(4) { grid-area: account; }
-  .history-row-del { grid-area: del; width: 100%; }
+  .history-row {
+    grid-template-columns: 1fr 1fr auto;
+    grid-template-areas:
+      "date buyer del"
+      "media account del";
+    gap: 6px;
+  }
+  .history-row .h-date { grid-area: date; }
+  .history-row .h-buyer { grid-area: buyer; }
+  .history-row .h-media { grid-area: media; }
+  .history-row .h-account { grid-area: account; }
+  .history-row-del { grid-area: del; width: 34px; height: 100%; min-height: 74px; }
 }
 .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px; box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04); overflow: hidden; cursor: pointer; transition: box-shadow 0.15s; }
 .product-card:active { box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.08); }
@@ -513,7 +518,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
   </div>
 </div>
 
-<!-- 画像拡大プレビューモーダル（拡大表示専用の高解像度画像を読み込みます） -->
+<!-- 画像拡大プレビューモーダル -->
 <div class="overlay" id="imgOverlay" onclick="closeImgPreview()" style="justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.75); z-index: 350;">
   <img id="enlargedImg" src="" style="width: 100%; max-width: 640px; max-height: 85vh; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain; background:#111;">
 </div>
@@ -680,7 +685,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     </div>
   </div>
 </div>
-<!-- アプリ内蔵の確認ダイアログ（環境依存のネイティブconfirm()を使わないため）-->
+<!-- アプリ内蔵の確認ダイアログ -->
 <div class="overlay" id="confirmOverlay" style="z-index:400; justify-content:center; align-items:center;">
   <div class="modal" style="max-width:320px !important; border-radius:16px !important;">
     <div class="modal-body" style="padding:24px 20px 16px; text-align:center;">
@@ -702,16 +707,16 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <span class="modal-title">発送日を記録</span>
       <button class="close-btn" onclick="closeShipModal()">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="padding: 20px;">
       <p id="shipQuestionText" style="font-size:14px; color:var(--text); line-height:1.6; margin-bottom:16px;">本日発送しましたか？</p>
       <div class="footer-row-split" id="shipYesNoRow">
         <button class="btn-cancel" onclick="onShipNo()">いいえ</button>
         <button class="btn-save" onclick="onShipYes()">はい（本日）</button>
       </div>
       <div id="shipDatePickRow" style="display:none;">
-        <div class="form-row">
+        <div class="form-row" style="margin-bottom:14px;">
           <label>発送日を選択</label>
-          <input type="date" id="ship-date-input">
+          <input type="date" id="ship-date-input" style="width: 100%; box-sizing: border-box; height: 38px;">
         </div>
         <div class="footer-row-split">
           <button class="btn-cancel" onclick="closeShipModal()">キャンセル</button>
@@ -753,13 +758,13 @@ function saveAliases() { localStorage.setItem(ALIAS_KEY, JSON.stringify(customer
 function saveMemos() { localStorage.setItem(MEMO_KEY, JSON.stringify(customerMemos)); }
 function saveFurigana() { localStorage.setItem(FURIGANA_KEY, JSON.stringify(customerFurigana)); }
 
-// ===== 画像の一時保管用（保存確定前のステージング）=====
+// ===== 画像の一時保管用 =====
 let tempImageBlobs = null;
 let imageRemoved = false;
 const thumbUrlCache = new Map();
 const fullUrlCache = new Map();
 
-/* ===== 確認ダイアログ（環境依存のネイティブconfirm()を使わない自前実装）===== */
+/* ===== 確認ダイアログ ===== */
 let confirmCallback = null;
 function showConfirm(message, onConfirm) {
   document.getElementById('confirmMessage').textContent = message;
@@ -1509,7 +1514,7 @@ function renderCustomerList() {
     return;
   }
 
-  // 統合候補用：全ての生の購入者名（正規化前）
+  // 統合候補用
   const allRaw = [...new Set(orders.map(o => (o.buyer||'').trim()).filter(Boolean))];
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -1568,7 +1573,7 @@ function renderCustomerList() {
   }).join('');
 }
 
-// ===== 顧客一覧画面のクリック／変更をまとめて処理（動的生成した要素に確実にイベントを紐付けるため委任方式にしています）=====
+// ===== 顧客一覧画面のクリック／変更を処理 =====
 document.getElementById('customerListBody').addEventListener('click', (e) => {
   const filterEl = e.target.closest('[data-action="filter"]');
   if (filterEl) { filterByCustomer(filterEl.dataset.name); return; }
@@ -1906,7 +1911,6 @@ function onSettingsOverlayClick(e) { if (e.target === document.getElementById('s
 
 function exportCSV() {
   const header = ['日付','回数','購入者','品名','単価','数量','金額','送料','備考','入金','梱包','発送日','メモ'];
-  // Excel等で開いた際の表示崩れを防ぐため、セル内の改行を半角スペースにエスケープ処理します
   const rows = orders.map(o => [
     o.date||'', o.count||'', o.buyer||'', o.item||'',
     o.price||0, o.qty||1, (o.price||0)*(o.qty||1), o.shipping||0,
@@ -2090,7 +2094,7 @@ function renderProductList() {
             ${p.price ? `<span class="product-price">¥${fmt(p.price)}</span>` : ''}
           </div>
           ${p.note ? `<div class="product-note">${esc(p.note)}</div>` : ''}
-          ${historyCount ? `<div class="product-history-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>履歴${historyCount}件</div>` : ''}
+          ${historyCount ? `<div class="product-history-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>使用記録${historyCount}件</div>` : ''}
         </div>
       </div>
     </div>`;
@@ -2121,7 +2125,7 @@ document.getElementById('productListBody').addEventListener('click', (e) => {
   if (card) openProductDetail(card.dataset.id);
 });
 
-/* ---- 品番詳細（画像拡大・アコーディオン） ---- */
+/* ---- 品番詳細 ---- */
 async function openProductDetail(id) {
   const p = products.find(p => p.id === id);
   if (!p) return;
@@ -2159,24 +2163,33 @@ async function openProductDetail(id) {
       <div class="detail-accordion-head" onclick="this.parentElement.classList.toggle('open')">
         <span class="detail-accordion-head-label">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
-          販売・使用履歴 ${(p.history||[]).length ? `(${p.history.length})` : ''}
+          使用記録 ${(p.history||[]).length ? `(${p.history.length})` : ''}
         </span>
         <svg class="detail-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
       </div>
       <div class="detail-accordion-body">
-        ${historyItems || '<div class="detail-note-text">履歴はありません</div>'}
+        ${historyItems || '<div class="detail-note-text">使用記録はありません</div>'}
       </div>
     </div>`;
 
   if (p.hasImage) {
     try {
-      const blob = await idbGet('product_' + p.id + '_thumb');
+      // プレビュー用に高解像度画像（_full）を取得して表示を鮮明化
+      const blob = await idbGet('product_' + p.id + '_full');
       if (blob) {
         const url = URL.createObjectURL(blob);
         const img = document.getElementById('productDetailImg');
         if (img) img.src = url;
       }
-    } catch(e) {}
+    } catch(e) {
+      // フォールバック
+      const thumbBlob = await idbGet('product_' + p.id + '_thumb');
+      if (thumbBlob) {
+        const url = URL.createObjectURL(thumbBlob);
+        const img = document.getElementById('productDetailImg');
+        if (img) img.src = url;
+      }
+    }
   }
 
   document.getElementById('productDetailEditBtn').onclick = () => {
