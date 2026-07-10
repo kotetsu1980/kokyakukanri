@@ -1718,7 +1718,7 @@ function renderItemPicker() {
       ${p.price ? `<span style="color:var(--text-sub);white-space:nowrap;">¥${fmt(p.price)}</span>` : ''}
     </div>`).join('');
 }
-document.getElementById('itemPickerDropdown').addEventListener('click', (e) => {
+document.getElementById('itemPickerDropdown').addEventListener('click', async (e) => {
   const row = e.target.closest('.item-picker-row');
   if (!row) return;
   const p = products.find(p => p.id === row.dataset.id);
@@ -1726,7 +1726,33 @@ document.getElementById('itemPickerDropdown').addEventListener('click', (e) => {
   document.getElementById('f-item').value = p.name;
   if (p.price) document.getElementById('f-price').value = p.price;
   document.getElementById('itemPickerDropdown').classList.remove('open');
+  await applyProductImageToOrder(p.id);
 });
+
+/* 品番の登録画像を、受注フォームの画像として複製セットする（通常の手動アップロードと同じ扱いにする） */
+async function applyProductImageToOrder(productId) {
+  try {
+    const [thumb, full] = await Promise.all([
+      idbGet('product_' + productId + '_thumb'),
+      idbGet('product_' + productId + '_full')
+    ]);
+    if (!thumb || !full) return; // その品番に画像登録が無ければ何もしない（既存の選択はそのまま残す）
+
+    tempImageBlobs = { thumb, full };
+    imageRemoved = false;
+
+    const preview = document.getElementById('modal-img-preview');
+    revokePreviewUrl(preview);
+    const url = URL.createObjectURL(thumb);
+    preview.src = url;
+    preview.dataset.blobUrl = url;
+    preview.style.display = 'block';
+    document.getElementById('btn-del-img').style.display = 'inline-block';
+  } catch (err) {
+    console.error(err);
+    showToast('品番の画像の読み込みに失敗しました');
+  }
+}
 document.addEventListener('click', (e) => {
   const dd = document.getElementById('itemPickerDropdown');
   if (dd && dd.classList.contains('open') && !e.target.closest('.item-picker-btn') && !e.target.closest('#itemPickerDropdown')) {
