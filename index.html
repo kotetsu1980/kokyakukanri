@@ -701,6 +701,7 @@ const ALIAS_KEY = 'order_manager_aliases_v1';
 const MEMO_KEY = 'order_manager_customer_memos_v1';
 const FURIGANA_KEY = 'order_manager_customer_furigana_v1';
 const PRODUCT_KEY = 'order_manager_products_v1';
+const INITIALIZED_KEY = 'order_manager_initialized_v1';
 let orders = [];
 let products = [];
 let editId = null;
@@ -718,9 +719,20 @@ function canonicalBuyer(raw) {
   const b = (raw || '').trim();
   return b ? (customerAliases[b] || b) : '';
 }
-function saveAliases() { localStorage.setItem(ALIAS_KEY, JSON.stringify(customerAliases)); }
-function saveMemos() { localStorage.setItem(MEMO_KEY, JSON.stringify(customerMemos)); }
-function saveFurigana() { localStorage.setItem(FURIGANA_KEY, JSON.stringify(customerFurigana)); }
+// 保存失敗時（容量不足・プライベートブラウズ等）に気付けるよう、書き込みは必ずtry/catchを通す
+function safeSetItem(key, value, label) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err) {
+    console.error('localStorage保存失敗:', key, err);
+    showToast(`${label}の保存に失敗しました（容量不足の可能性があります）`);
+    return false;
+  }
+}
+function saveAliases() { safeSetItem(ALIAS_KEY, JSON.stringify(customerAliases), '顧客名の統合設定'); }
+function saveMemos() { safeSetItem(MEMO_KEY, JSON.stringify(customerMemos), '顧客メモ'); }
+function saveFurigana() { safeSetItem(FURIGANA_KEY, JSON.stringify(customerFurigana), 'フリガナ'); }
 
 let tempImageBlobs = null;
 let imageRemoved = false;
@@ -779,8 +791,8 @@ async function load() {
   try { products = JSON.parse(localStorage.getItem(PRODUCT_KEY) || '[]'); } catch(e) { products = []; }
   await migrateLegacyImages();
 }
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(orders)); }
-function saveProducts() { localStorage.setItem(PRODUCT_KEY, JSON.stringify(products)); }
+function save() { return safeSetItem(STORAGE_KEY, JSON.stringify(orders), '受注データ'); }
+function saveProducts() { return safeSetItem(PRODUCT_KEY, JSON.stringify(products), '品番データ'); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function esc(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -1058,10 +1070,15 @@ function closeImgPreview() {
 }
 
 /* ===== SEARCH / SORT ===== */
+// 先にHTMLエスケープしてからハイライトを付ける。検索語もエスケープ済みテキストに対して照合する。
+function hlEscaped(escapedText, q) {
+  if (!q || !escapedText) return escapedText || '';
+  const safeQ = esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (!safeQ) return escapedText;
+  return escapedText.replace(new RegExp(safeQ, 'gi'), m => `<mark>${m}</mark>`);
+}
 function hl(text, q) {
-  if (!q || !text) return String(text||'');
-  const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return String(text).replace(new RegExp(safe, 'gi'), m => `<mark>${m}</mark>`);
+  return hlEscaped(esc(text), q);
 }
 function matchSearch(o, q) {
   if (!q) return true;
@@ -1264,8 +1281,8 @@ function renderTable(list, q) {
     prevDate = o.date;
     const amt = (o.price||0)*(o.qty||1);
     const isHit = q && matchSearch(o, q);
-    const noteDisplay = o.note ? o.note.replace(/\n/g, '<br>') : '';
-    const note2Display = o.note2 ? o.note2.replace(/\n/g, '<br>') : '';
+    const noteDisplay = o.note ? esc(o.note).replace(/\n/g, '<br>') : '';
+    const note2Display = o.note2 ? esc(o.note2).replace(/\n/g, '<br>') : '';
     const isCompleted = !isIncomplete(o);
     const kanryoBadge = isCompleted ? `<span class="kanryo-badge">完了</span>` : '';
     const imageHtml = o.hasImage
@@ -1288,11 +1305,11 @@ function renderTable(list, q) {
       <td class="center">${o.qty||1}</td>
       <td class="right amount">¥${fmt(amt)}</td>
       <td class="right" style="color:var(--text-sub);">${o.shipping ? '¥'+fmt(o.shipping) : ''}</td>
-      <td class="note-cell">${q ? hl(noteDisplay, q) : noteDisplay}</td>
+      <td class="note-cell">${q ? hlEscaped(noteDisplay, q) : noteDisplay}</td>
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="paid" onclick="toggleStatus('${o.id}','paid')">${markEl(o.paid,'on')}</td>
       <td class="toggle-cell" data-toggle-id="${o.id}" data-toggle-field="packed" onclick="toggleStatus('${o.id}','packed')">${markEl(o.packed,'on')}</td>
       <td class="toggle-cell ship-cell" data-ship-id="${o.id}" onclick="openShipModal('${o.id}')">${o.sentDate ? `<span class="ship-date-mark">${fmtDate(o.sentDate)}</span>` : `<span class="toggle-mark"></span>`}</td>
-      <td class="note-cell">${q ? hl(note2Display, q) : note2Display}</td>
+      <td class="note-cell">${q ? hlEscaped(note2Display, q) : note2Display}</td>
       <td class="actions"><button class="row-action-btn" onclick="openEdit('${o.id}')">…</button></td>
     </tr>`;
   });
@@ -1718,7 +1735,7 @@ function renderItemPicker() {
       ${p.price ? `<span style="color:var(--text-sub);white-space:nowrap;">¥${fmt(p.price)}</span>` : ''}
     </div>`).join('');
 }
-document.getElementById('itemPickerDropdown').addEventListener('click', async (e) => {
+document.getElementById('itemPickerDropdown').addEventListener('click', (e) => {
   const row = e.target.closest('.item-picker-row');
   if (!row) return;
   const p = products.find(p => p.id === row.dataset.id);
@@ -1726,33 +1743,7 @@ document.getElementById('itemPickerDropdown').addEventListener('click', async (e
   document.getElementById('f-item').value = p.name;
   if (p.price) document.getElementById('f-price').value = p.price;
   document.getElementById('itemPickerDropdown').classList.remove('open');
-  await applyProductImageToOrder(p.id);
 });
-
-/* 品番の登録画像を、受注フォームの画像として複製セットする（通常の手動アップロードと同じ扱いにする） */
-async function applyProductImageToOrder(productId) {
-  try {
-    const [thumb, full] = await Promise.all([
-      idbGet('product_' + productId + '_thumb'),
-      idbGet('product_' + productId + '_full')
-    ]);
-    if (!thumb || !full) return; // その品番に画像登録が無ければ何もしない（既存の選択はそのまま残す）
-
-    tempImageBlobs = { thumb, full };
-    imageRemoved = false;
-
-    const preview = document.getElementById('modal-img-preview');
-    revokePreviewUrl(preview);
-    const url = URL.createObjectURL(thumb);
-    preview.src = url;
-    preview.dataset.blobUrl = url;
-    preview.style.display = 'block';
-    document.getElementById('btn-del-img').style.display = 'inline-block';
-  } catch (err) {
-    console.error(err);
-    showToast('品番の画像の読み込みに失敗しました');
-  }
-}
 document.addEventListener('click', (e) => {
   const dd = document.getElementById('itemPickerDropdown');
   if (dd && dd.classList.contains('open') && !e.target.closest('.item-picker-btn') && !e.target.closest('#itemPickerDropdown')) {
@@ -1897,7 +1888,23 @@ async function backupData() {
     const [imageThumb, imageFull] = await Promise.all([blobToBase64(thumbBlob), blobToBase64(fullBlob)]);
     return { ...o, imageThumb, imageFull };
   }));
-  const json = JSON.stringify({ version: 4, exportedAt: new Date().toISOString(), orders: ordersWithImages, customerAliases, customerMemos, customerFurigana }, null, 2);
+  // 品番データも画像込みでバックアップ対象に含める（受注画像と同じ方式でbase64化）
+  const productsWithImages = await Promise.all(products.map(async p => {
+    if (!p.hasImage) return { ...p };
+    const [thumbBlob, fullBlob] = await Promise.all([
+      idbGet('product_' + p.id + '_thumb').catch(()=>null),
+      idbGet('product_' + p.id + '_full').catch(()=>null)
+    ]);
+    const [imageThumb, imageFull] = await Promise.all([blobToBase64(thumbBlob), blobToBase64(fullBlob)]);
+    return { ...p, imageThumb, imageFull };
+  }));
+  const json = JSON.stringify({
+    version: 5,
+    exportedAt: new Date().toISOString(),
+    orders: ordersWithImages,
+    products: productsWithImages,
+    customerAliases, customerMemos, customerFurigana
+  }, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1960,6 +1967,26 @@ function onRestoreFile(e) {
         customerFurigana = (data.customerFurigana && typeof data.customerFurigana === 'object') ? data.customerFurigana : {};
         saveAliases(); saveMemos(); saveFurigana();
 
+        // 品番データの復元（旧バックアップにproductsが無い場合は空のまま = 既存互換）
+        const restoredProducts = Array.isArray(data.products) ? data.products : [];
+        const newProducts = [];
+        productThumbUrlCache.clear();
+        for (const p of restoredProducts) {
+          const product = { ...p };
+          try {
+            if (p.imageThumb && p.imageFull) {
+              const [thumbBlob, fullBlob] = await Promise.all([base64ToBlob(p.imageThumb), base64ToBlob(p.imageFull)]);
+              await idbSet('product_' + product.id + '_thumb', thumbBlob);
+              await idbSet('product_' + product.id + '_full', fullBlob);
+              product.hasImage = true;
+            }
+          } catch(imgErr) { console.error('品番画像復元失敗:', product.id, imgErr); }
+          delete product.imageThumb; delete product.imageFull;
+          newProducts.push(product);
+        }
+        products = newProducts;
+        saveProducts();
+
         recalculateAllCounts();
         save(); closeSettings(); render();
         showToast('復元が完了しました');
@@ -1974,12 +2001,27 @@ function onRestoreFile(e) {
 }
 
 function deleteAllData() {
-  showConfirm('全データを削除しますか？この操作は元に戻せません。', async () => {
-    orders = []; openMonths = {};
-    await idbClearAll().catch(()=>{});
+  showConfirm('全データを削除しますか？（受注・品番・顧客の統合設定/メモ/フリガナ・画像すべて）この操作は元に戻せません。', async () => {
+    orders = [];
+    products = [];
+    customerAliases = {};
+    customerMemos = {};
+    customerFurigana = {};
+    openMonths = {};
+    await idbClearAll().catch(()=>{}); // 受注画像・品番画像とも同じストアなのでこれで全消去される
     thumbUrlCache.clear();
     fullUrlCache.clear();
-    save(); closeSettings(); render();
+    productThumbUrlCache.clear();
+    save();
+    saveProducts();
+    saveAliases();
+    saveMemos();
+    saveFurigana();
+    // 「全削除」後に再読み込みしてもサンプルデータが復活しないようにするフラグ
+    try { localStorage.setItem(INITIALIZED_KEY, '1'); } catch(e) {}
+    closeSettings();
+    render();
+    showToast('全データを削除しました');
   });
 }
 
@@ -2412,7 +2454,9 @@ function deleteProduct() {
 
 async function init() {
   await load();
-  if (orders.length === 0) {
+  const alreadyInitialized = localStorage.getItem(INITIALIZED_KEY) === '1';
+  if (orders.length === 0 && !alreadyInitialized) {
+    try { localStorage.setItem(INITIALIZED_KEY, '1'); } catch(e) {}
     orders = [
       {id:uid(),date:'2026-05-01',count:'',buyer:'山田',item:'アクセサリー',price:5000,qty:1,shipping:0,note:'予約',paid:true,packed:false,sentDate:''},
       {id:uid(),date:'2026-05-20',count:'',buyer:'田中',item:'ピアス',price:2500,qty:2,shipping:370,note:'',paid:true,packed:true,sentDate:''},
