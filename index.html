@@ -100,7 +100,7 @@ header h1 { font-family: var(--font-voice); font-size: 18px; font-weight: 500; c
 .toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; gap: 8px; align-items: center; }
 .search-wrap { flex: 1; position: relative; }
 .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); pointer-events: none; }
-.search-input { width: 100%; border: 1px solid var(--border); border-radius: 20px; padding: 10px 28px 10px 34px; font-size: 13px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; transition: all 0.15s; }
+.search-input { width: 100%; border: 1px solid var(--border); border-radius: 20px; padding: 10px 28px 10px 34px; font-size: 16px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; transition: all 0.15s; }
 .search-input:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(163, 102, 122, 0.12); }
 .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--border-strong); border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; cursor: pointer; color: var(--text-sub); display: none; align-items: center; justify-content: center; }
 .search-clear.visible { display: flex; }
@@ -187,9 +187,9 @@ td.actions { padding: 0; min-width: 40px; }
 .modal-body { padding: 20px; overflow-y: auto; overflow-x: hidden; }
 .form-row { margin-bottom: 14px; }
 .form-row label { display: block; font-size: 11px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-.form-row input, .form-row select { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; transition: border 0.15s; }
+.form-row input, .form-row select { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; transition: border 0.15s; }
 .form-row input:focus, .form-row select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(163, 102, 122, 0.12); }
-.auto-textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; min-height: 80px; resize: none; overflow: hidden; line-height: 1.5; transition: border 0.15s; }
+.auto-textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; min-height: 80px; resize: none; overflow: hidden; line-height: 1.5; transition: border 0.15s; }
 .auto-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(163, 102, 122, 0.12); }
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
@@ -274,7 +274,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .customer-jump-btn { background: none; border: 1px solid var(--border); border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: var(--text-sub); cursor: pointer; flex-shrink: 0; }
 .customer-jump-btn:active { background: var(--bg); }
 .customer-jump-btn svg { width: 14px; height: 14px; }
-.customer-furigana { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 11px; font-family: inherit; background: var(--bg); color: var(--text-sub); outline: none; }
+.customer-furigana { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 16px; font-family: inherit; background: var(--bg); color: var(--text-sub); outline: none; }
 
 /* ===== PRODUCT ===== */
 .code-input-row { display: flex; align-items: center; gap: 8px; }
@@ -288,9 +288,9 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .checkbox-row span { font-size: 13px; font-weight: 600; color: var(--text-sub); }
 .history-rows { margin-top: 10px; }
 .history-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 8px; align-items: center; }
-.history-row input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; width: 100%; box-sizing: border-box; height: 34px; }
+.history-row input { border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; width: 100%; box-sizing: border-box; height: 38px; }
 .history-row input:focus { border-color: var(--accent); }
-.history-row-del { background: #fee2e2; border: none; border-radius: 8px; width: 30px; height: 34px; color: #dc2626; font-size: 13px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.history-row-del { background: #fee2e2; border: none; border-radius: 8px; width: 30px; height: 38px; color: #dc2626; font-size: 13px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 @media (max-width: 480px) {
   .history-row {
     display: flex;
@@ -299,7 +299,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
     gap: 6px;
   }
   .history-row input { min-width: 0; }
-  .history-row-del { align-self: flex-end; width: 44px; height: 34px; }
+  .history-row-del { align-self: flex-end; width: 44px; height: 38px; }
 }
 .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px; box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04); overflow: hidden; cursor: pointer; transition: box-shadow 0.15s; }
 .product-card:active { box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.08); }
@@ -347,16 +347,27 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .customer-note2 { font-size: 11px; color: var(--text-sub); margin-top: 8px; padding: 8px 10px; background: var(--bg); border-radius: 8px; line-height: 1.4; }
 .customer-note2 strong { color: var(--text); font-weight: 600; }
 .customer-memo-label { font-size: 10px; font-weight: 600; color: var(--text-sub); margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-.customer-memo { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; min-height: 44px; resize: vertical; }
+.customer-memo { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; min-height: 44px; resize: vertical; }
 .customer-memo:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(163, 102, 122, 0.12); }
 .customer-alias-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 .alias-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--accent-bg); color: var(--accent); border-radius: 20px; padding: 3px 6px 3px 10px; }
 .alias-chip button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; line-height: 1; padding: 2px; }
 .merge-select-row { display: flex; gap: 6px; margin-top: 10px; }
-.merge-select-row select { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 7px 8px; font-size: 12px; font-family: inherit; background: var(--surface); color: var(--text); }
+.merge-select-row select { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 7px 8px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--text); }
 .merge-btn { background: var(--surface-muted); border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 600; color: var(--text-sub); cursor: pointer; white-space: nowrap; }
 .merge-btn:active { background: var(--surface-muted-active); }
 .customer-empty { text-align: center; padding: 40px 20px; color: var(--text-sub); font-size: 13px; }
+
+/* ===== 入金〜発送 クイック編集 ===== */
+.buyer-cell, .item-cell { -webkit-user-select: none; user-select: none; }
+.qs-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; -webkit-user-select: none; user-select: none; transition: background 0.15s; }
+.qs-row:active { background: var(--bg); }
+.qs-pill { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; background: var(--bg); color: var(--text-sub); white-space: nowrap; }
+.qs-pill.on { background: var(--success-bg); color: var(--success); }
+.qs-detail { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.qs-thumb, .qs-thumb-placeholder { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; background: var(--bg); border: 1px solid var(--border); flex-shrink: 0; }
+.qs-thumb-placeholder { display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.qs-thumb-placeholder svg { width: 22px; height: 22px; }
 </style>
 </head>
 <body>
@@ -685,7 +696,7 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
       <div id="shipDatePickRow" style="display:none;">
         <div class="form-row" style="margin-bottom:14px;">
           <label>発送日を選択</label>
-          <input type="date" id="ship-date-input" style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; height: 38px;">
+          <input type="date" id="ship-date-input" style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; height: 38px; font-size: 16px;">
         </div>
         <div class="footer-row-split">
           <button class="btn-cancel" onclick="closeShipModal()">キャンセル</button>
@@ -693,6 +704,50 @@ mark { background: #fef08a; color: inherit; border-radius: 2px; padding: 0 1px; 
         </div>
       </div>
       <button type="button" class="btn-delete" id="shipClearBtn" style="width:100%; margin-top:14px; display:none;" onclick="onShipClear()">未発送に戻す</button>
+    </div>
+  </div>
+</div>
+<!-- 入金〜発送 クイック編集モーダル（購入者名/商品名のダブルタップで開く） -->
+<div class="overlay" id="quickStatusOverlay" style="justify-content:center; align-items:center;">
+  <div class="modal" style="max-width:400px !important; border-radius:16px !important;">
+    <div class="modal-header">
+      <span class="modal-title">状態を編集</span>
+      <button class="close-btn" onclick="closeQuickStatusModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px;">
+      <div class="qs-detail">
+        <div id="quickStatusThumbWrap"></div>
+        <div style="min-width:0;">
+          <div id="quickStatusBuyer" style="font-family:var(--font-voice); font-size:17px; color:var(--text);"></div>
+          <div id="quickStatusItem" style="font-size:13px; color:var(--text-sub); margin-top:2px;"></div>
+          <div id="quickStatusMeta" style="font-size:12px; color:var(--text-muted); margin-top:3px;"></div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="qs-row" onclick="quickToggleField('paid')">
+          <span style="font-size:13px; font-weight:600; color:var(--text-sub);">入金</span>
+          <span id="qsPaidMark"></span>
+        </div>
+        <div class="qs-row" onclick="quickToggleField('packed')">
+          <span style="font-size:13px; font-weight:600; color:var(--text-sub);">梱包</span>
+          <span id="qsPackedMark"></span>
+        </div>
+        <div class="qs-row" onclick="quickShipRowTap()">
+          <span style="font-size:13px; font-weight:600; color:var(--text-sub);">発送</span>
+          <span id="qsShipMark"></span>
+        </div>
+      </div>
+      <div id="qsShipDateArea" style="display:none; margin-top:14px;">
+        <div class="footer-row-split" style="margin-bottom:10px;">
+          <button class="btn-delete" onclick="qsClearShipDate()">未発送に戻す</button>
+          <button class="btn-save" onclick="qsSetToday()">本日発送</button>
+        </div>
+        <div class="form-row" style="margin-bottom:10px;">
+          <label>日付を指定</label>
+          <input type="date" id="qs-ship-date-input" style="width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; height: 38px; font-size: 16px;">
+        </div>
+        <button type="button" class="btn-continue-diff" style="width:100%;" onclick="qsConfirmDate()">この日付で設定</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1215,9 +1270,9 @@ function onShipDateConfirm() {
   setShipDate(val);
 }
 function onShipClear() { setShipDate(''); }
-function setShipDate(dateStr) {
-  const o = orders.find(o => o.id === shipTargetId);
-  if (!o) { closeShipModal(); return; }
+function applyShipDate(id, dateStr) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return null;
   o.sentDate = dateStr || '';
   save();
 
@@ -1232,7 +1287,72 @@ function setShipDate(dateStr) {
   const m = getMonth(o.date) || 'none';
   updateMonthBadge(m);
   refreshCompletionBadge(o.id);
+  return o;
+}
+function setShipDate(dateStr) {
+  const o = applyShipDate(shipTargetId, dateStr);
   closeShipModal();
+  if (o) showToast(o.sentDate ? '発送日を記録しました' : '未発送に戻しました');
+}
+
+/* ===== 入金〜発送 クイック編集モーダル ===== */
+let quickStatusTargetId = null;
+function openQuickStatusModal(id) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+  quickStatusTargetId = id;
+  document.getElementById('quickStatusBuyer').textContent = canonicalBuyer(o.buyer) || '(購入者未入力)';
+  document.getElementById('quickStatusItem').textContent = o.item || '(商品名未入力)';
+  const amt = (o.price||0)*(o.qty||1);
+  document.getElementById('quickStatusMeta').textContent = `${fmtDate(o.date)}　¥${fmt(amt)}`;
+  document.getElementById('quickStatusThumbWrap').innerHTML = o.hasImage
+    ? `<img data-img-id="${o.id}" class="qs-thumb" alt="商品画像">`
+    : `<div class="qs-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`;
+  document.getElementById('qsShipDateArea').style.display = 'none';
+  renderQuickStatusMarks(o);
+  document.getElementById('quickStatusOverlay').classList.add('open');
+  hydrateThumbnails();
+}
+function closeQuickStatusModal() {
+  document.getElementById('quickStatusOverlay').classList.remove('open');
+  quickStatusTargetId = null;
+}
+function renderQuickStatusMarks(o) {
+  document.getElementById('qsPaidMark').innerHTML = qsPillHtml(o.paid, o.paid ? '入金済' : '未入金');
+  document.getElementById('qsPackedMark').innerHTML = qsPillHtml(o.packed, o.packed ? '梱包済' : '未梱包');
+  document.getElementById('qsShipMark').innerHTML = qsPillHtml(!!o.sentDate, o.sentDate ? fmtDate(o.sentDate) + ' 発送済' : '未発送');
+}
+function qsPillHtml(on, label) {
+  return `<span class="qs-pill ${on ? 'on' : ''}">${esc(label)}</span>`;
+}
+function quickToggleField(field) {
+  const o = orders.find(o => o.id === quickStatusTargetId);
+  if (!o) return;
+  toggleStatus(o.id, field);
+  renderQuickStatusMarks(o);
+}
+function quickShipRowTap() {
+  const o = orders.find(o => o.id === quickStatusTargetId);
+  if (!o) return;
+  const area = document.getElementById('qsShipDateArea');
+  const opening = area.style.display === 'none';
+  area.style.display = opening ? 'block' : 'none';
+  if (opening) {
+    document.getElementById('qs-ship-date-input').value = o.sentDate || getLocalDateString();
+  }
+}
+function qsSetToday() { quickSetShipDate(getLocalDateString()); }
+function qsClearShipDate() { quickSetShipDate(''); }
+function qsConfirmDate() {
+  const val = document.getElementById('qs-ship-date-input').value;
+  if (!val) { showToast('日付を選択してください'); return; }
+  quickSetShipDate(val);
+}
+function quickSetShipDate(dateStr) {
+  const o = applyShipDate(quickStatusTargetId, dateStr);
+  if (!o) return;
+  document.getElementById('qsShipDateArea').style.display = 'none';
+  renderQuickStatusMarks(o);
   showToast(o.sentDate ? '発送日を記録しました' : '未発送に戻しました');
 }
 
@@ -1295,10 +1415,10 @@ function renderTable(list, q) {
     html += `<tr class="${isNewDate ? 'group-start' : ''} ${isHit && q ? 'highlight' : ''}">
       <td class="left" style="font-size:11px;color:var(--text-sub);font-weight:500;">${isNewDate ? hl(fmtDate(o.date), q) : ''}</td>
       <td class="center">${o.count||''}</td>
-      <td class="left buyer-cell" style="font-weight:600; text-align: left; vertical-align: middle;">
+      <td class="left buyer-cell" style="font-weight:600; text-align: left; vertical-align: middle;" ondblclick="openQuickStatusModal('${o.id}')">
         ${kanryoBadge}${hl(o.buyer||'', q)}
       </td>
-      <td class="left" style="vertical-align: middle;">
+      <td class="left item-cell" style="vertical-align: middle;" ondblclick="openQuickStatusModal('${o.id}')">
         <div style="display:flex; align-items:center; gap:8px;">
           ${imageHtml}
           <span>${hl(o.item||'', q)}</span>
